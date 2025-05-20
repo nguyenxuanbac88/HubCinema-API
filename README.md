@@ -37,8 +37,8 @@ This system uses a relational database design. Some key tables include:
 
 ### 1. Clone the Project
 ```bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
+git clone https://github.com/nguyenxuanbac88/API_ProjectCinema
+cd API_ProjectCinema
 ```
 
 ### 2. Set up Database Connection
@@ -93,6 +93,16 @@ http://localhost:5000/swagger
 ## 👨‍🎓 Developer
 
 **Nguyễn Xuân Bắc**  
-Student ID: `23DH110293`  
-Class: `PM231H`  
+Student ID: `23DH110293` 
+
+**Lâm Tấn Thành**  
+Student ID: `23DH113200` 
+
+**Trần Duy Khoa**  
+Student ID: `23DH114398` 
+
+**Nguyễn Đàm Khá**  
+Student ID: `23DH111567` 
+
 **Ho Chi Minh City University of Foreign Languages and Information Technology (HUFLIT)**
+
