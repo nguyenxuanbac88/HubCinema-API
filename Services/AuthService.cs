@@ -18,11 +18,18 @@ namespace API_Project.Services
 
         public string Login(LoginModel model)
         {
-            var user = _db.Users.FirstOrDefault(u => u.Phone == model.Phone);
-            if (user == null || user.Password != model.Password)
+            var user = _db.Users
+                .FirstOrDefault(u => u.Phone == model.Username || u.Email == model.Username);
+
+            if (user == null)
                 return null;
+
+            if (!PasswordHasher.VerifyPassword(model.Password, user.Password))
+                return null;
+
             string roleName = ((UserRole)user.Role).ToString();
             return _tokenGenerator.GenerateToken(user.Phone, roleName);
         }
+
     }
 }
