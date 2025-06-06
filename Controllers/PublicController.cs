@@ -7,17 +7,17 @@ using System.Threading.Tasks;
 namespace API_Project.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
-    public class GetMoviesController : ControllerBase
+    [Route("api/Public")]
+    public class PublicController : ControllerBase
     {
         private readonly MovieService _movieService;
 
-        public GetMoviesController(MovieService movieService)
+        public PublicController(MovieService movieService)
         {
             _movieService = movieService;
         }
 
-        [HttpGet]
+        [HttpGet("GetMovies")]
         public async Task<IActionResult> GetAllMovies()
         {
             try
