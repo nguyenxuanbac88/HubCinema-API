@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace API_Project.Models.Entities
 {
-    [Table("Foods")]
+    [Table("Food")]
     public class Food
     {
         [Key]
@@ -11,17 +11,18 @@ namespace API_Project.Models.Entities
         public int IDFood { get; set; }
 
         [Column("FoodName")]
-        [MaxLength(255)]
-        public int FoodName { get; set; }
+        public string FoodName { get; set; }
 
         [Column("Description")]
-        [MaxLength(255)]
-        public int Description { get; set; }
+        public string Description { get; set; }
 
         [Column("Price")]
         public Decimal Price { get; set; }
 
         [Column("ImageURL")]
         public string ImageURL { get; set; }
+
+        [Column("CinemaID")]
+        public int CinemaID { get; set; }
     }
 }

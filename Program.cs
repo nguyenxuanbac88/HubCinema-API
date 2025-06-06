@@ -16,7 +16,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddSingleton<JwtTokenGenerator>();
-builder.Services.AddScoped<MovieService>();
+builder.Services.AddScoped<PublicService>();
 
 
 var app = builder.Build();
