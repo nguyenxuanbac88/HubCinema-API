@@ -42,7 +42,7 @@ namespace API_Project.Models.Entities
 
         [Column("TokenPassword")]
         [MaxLength(255)]
-        public string TokenPassword { get; set; }
+        public string? TokenPassword { get; set; }
 
         [Column("Points")]
         public int Points { get; set; }
@@ -52,7 +52,7 @@ namespace API_Project.Models.Entities
 
         [Column("TokenLogin")]
         [MaxLength(255)]
-        public string TokenLogin { get; set; }
-        public string ZoneAddress { get; set; }
+        public string? TokenLogin { get; set; }
+        public string? ZoneAddress { get; set; }
     }
 }

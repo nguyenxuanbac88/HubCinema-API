@@ -20,13 +20,13 @@ namespace API_Project.Services
         public string Login(LoginDTO model)
         {
             var user = _db.Users
-                .FirstOrDefault(u => u.Phone == model.Username || u.Email == model.Username);
+                .FirstOrDefault(u => u.Phone.Trim() == model.Username.Trim() || u.Email.Trim() == model.Username.Trim());
 
             if (user == null)
                 return null;
 
-            if (!PasswordHasher.VerifyPassword(model.Password, user.Password))
-                return null;
+            if (!PasswordHasher.VerifyPassword(model.Password.Trim(), user.Password.Trim()))
+            return null;
 
             string roleName = ((UserRole)user.Role).ToString();
             return _tokenGenerator.GenerateToken(user.Phone, roleName);
@@ -39,11 +39,11 @@ namespace API_Project.Services
             if(age<12)
                 return RegisterResult.Underage;
             //Kiểm tra SDT và Email đã tồn tại trong CSDL chưa ?
-            if (_db.Users.Any(u=> u.Phone == model.phone || u.Email == model.email))
+            if (_db.Users.Any(u=> u.Phone.Trim() == model.phone.Trim() || u.Email.Trim() == model.email.Trim()))
                 return RegisterResult.PhoneOrEmailExists;
 
             //Dùng hàm mã hoá để mã hoá mật khẩu
-            string hashedPassword = PasswordHasher.HashPassword(model.password);
+            string hashedPassword = PasswordHasher.HashPassword(model.password).Trim();
             var user = new User
             {
                 Phone = model.phone,
@@ -62,6 +62,7 @@ namespace API_Project.Services
 
             //Thêm lớp ảo ID cho User
             user.UserCode = GenerateUserCode(user.IDUser);
+            _db.SaveChanges();
             return RegisterResult.Success;
         }
         private string GenerateUserCode(int idUser)
