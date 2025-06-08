@@ -2,7 +2,7 @@
 
 namespace API_Project.Models.DTOs
 {
-    public class LoginModel
+    public class LoginDTO
     {
         [Required(ErrorMessage = "Vui lòng nhập tài khoản.")]
         public string Username { get; set; }
