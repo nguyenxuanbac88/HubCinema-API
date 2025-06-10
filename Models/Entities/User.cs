@@ -9,7 +9,11 @@ namespace API_Project.Models.Entities
     {
         [Key]
         [Column("IDUser")]
-        public int Id { get; set; }
+        public int IDUser { get; set; }
+
+        [MaxLength(20)]
+        [Column("UserCode")]
+        public string UserCode { get; set; }
 
         [Column("Phone")]
         [MaxLength(10)]
@@ -38,7 +42,7 @@ namespace API_Project.Models.Entities
 
         [Column("TokenPassword")]
         [MaxLength(255)]
-        public string TokenPassword { get; set; }
+        public string? TokenPassword { get; set; }
 
         [Column("Points")]
         public int Points { get; set; }
@@ -48,6 +52,7 @@ namespace API_Project.Models.Entities
 
         [Column("TokenLogin")]
         [MaxLength(255)]
-        public string TokenLogin { get; set; }
+        public string? TokenLogin { get; set; }
+        public string? ZoneAddress { get; set; }
     }
 }
