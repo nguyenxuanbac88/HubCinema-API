@@ -8,9 +8,10 @@ namespace API_Project.Models.Entities
     public class Movie
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("IDMovie")]
         public int IDMovie { get; set; }
-
+       
         [Column("MovieName")]
         [MaxLength(255)]
         public string MovieName { get; set; }

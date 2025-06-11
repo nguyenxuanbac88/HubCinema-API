@@ -1,6 +1,7 @@
 ﻿// MovieService.cs
 using API_Project.Data;
 using API_Project.Models.DTOs;
+using API_Project.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -32,6 +33,31 @@ public class PublicService
             .ToListAsync();
 
         return movies;
+    }
+    public async Task<bool> CreateMovie(MovieDTO movieDTO)
+    {
+        try
+        {
+            var movie = new Movie
+            {
+                MovieName = movieDTO.MovieName,
+                Genre = movieDTO.Genre,
+                Duration = movieDTO.Duration,
+                Description = movieDTO.Description,
+                Director = movieDTO.Director,
+                ReleaseDate = movieDTO.ReleaseDate,
+                CoverURL = movieDTO.CoverURL,
+                TrailerURL = movieDTO.TrailerURL
+            };
+
+            _context.Movies.Add(movie);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
     public async Task<List<FoodDTO>> GetAllFoodsAsync()
     {
@@ -75,5 +101,43 @@ public class PublicService
             })
             .ToListAsync();
         return rooms;
+    }
+    public async Task<MovieDTO?> GetMovieByIdAsync(int id)
+    {
+        var movie = await _context.Movies
+            .Where(m => m.IDMovie == id)
+            .Select(m => new MovieDTO
+            {
+                IDMovie = m.IDMovie,
+                MovieName = m.MovieName,
+                Genre = m.Genre,
+                Duration = m.Duration,
+                Description = m.Description,
+                Director = m.Director,
+                ReleaseDate = m.ReleaseDate,
+                CoverURL = m.CoverURL,
+                TrailerURL = m.TrailerURL
+            })
+            .FirstOrDefaultAsync();
+        return movie;
+    }
+    public async Task<bool> UpdateMovieAsync(int id, MovieDTO movieDTO)
+    {
+        var movie = await _context.Movies.FindAsync(movieDTO.IDMovie);
+        if (movie == null)
+        {
+            return false;
+        }
+        movie.MovieName = movieDTO.MovieName;
+        movie.Genre = movieDTO.Genre;
+        movie.Duration = movieDTO.Duration;
+        movie.Description = movieDTO.Description;
+        movie.Director = movieDTO.Director;
+        movie.ReleaseDate = movieDTO.ReleaseDate;
+        movie.CoverURL = movieDTO.CoverURL;
+        movie.TrailerURL = movieDTO.TrailerURL;
+        _context.Movies.Update(movie);
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

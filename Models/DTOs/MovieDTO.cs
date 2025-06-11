@@ -2,7 +2,7 @@
 {
     public class MovieDTO
     {
-        public int IDMovie { get; set; }
+        public int? IDMovie { get; set; }
         public string MovieName { get; set; }
         public string Genre { get; set; }
         public int Duration { get; set; }
