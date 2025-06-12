@@ -28,7 +28,10 @@ public class PublicService
                 Director = m.Director,
                 ReleaseDate = m.ReleaseDate,
                 CoverURL = m.CoverURL,
-                TrailerURL = m.TrailerURL
+                TrailerURL = m.TrailerURL,
+                AgeRestriction = m.AgeRestriction,
+                Producer = m.Producer,
+                Actors = m.Actors
             })
             .ToListAsync();
 
@@ -47,7 +50,10 @@ public class PublicService
                 Director = movieDTO.Director,
                 ReleaseDate = movieDTO.ReleaseDate,
                 CoverURL = movieDTO.CoverURL,
-                TrailerURL = movieDTO.TrailerURL
+                TrailerURL = movieDTO.TrailerURL,
+                AgeRestriction = movieDTO.AgeRestriction,
+                Producer = movieDTO.Producer,
+                Actors = movieDTO.Actors
             };
 
             _context.Movies.Add(movie);
@@ -95,9 +101,9 @@ public class PublicService
                 IDRoom = r.IDRoom,
                 CinemaID = r.CinemaID,
                 RoomName = r.RoomName,
-                TotalSeats = r.TotalSeats,
-                TicketPriceID = r.TicketPriceID,
-                ImageURL = r.ImageURL
+                RoomType = r.RoomType,
+                RoomImageURL = r.RoomImageURL,
+                Status = r.Status
             })
             .ToListAsync();
         return rooms;
@@ -116,14 +122,17 @@ public class PublicService
                 Director = m.Director,
                 ReleaseDate = m.ReleaseDate,
                 CoverURL = m.CoverURL,
-                TrailerURL = m.TrailerURL
+                TrailerURL = m.TrailerURL,
+                AgeRestriction = m.AgeRestriction,
+                Producer = m.Producer,
+                Actors = m.Actors
             })
             .FirstOrDefaultAsync();
         return movie;
     }
     public async Task<bool> UpdateMovieAsync(int id, MovieDTO movieDTO)
     {
-        var movie = await _context.Movies.FindAsync(movieDTO.IDMovie);
+        var movie = await _context.Movies.FindAsync(id);
         if (movie == null)
         {
             return false;
@@ -136,6 +145,9 @@ public class PublicService
         movie.ReleaseDate = movieDTO.ReleaseDate;
         movie.CoverURL = movieDTO.CoverURL;
         movie.TrailerURL = movieDTO.TrailerURL;
+        movie.AgeRestriction = movieDTO.AgeRestriction;
+        movie.Producer = movieDTO.Producer;
+        movie.Actors = movieDTO.Actors;
         _context.Movies.Update(movie);
         await _context.SaveChangesAsync();
         return true;

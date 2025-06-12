@@ -4,39 +4,48 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace API_Project.Models.Entities
 {
-    [Table("Movies")]
+    [Table("Phim")]
     public class Movie
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Column("IDMovie")]
-        public int IDMovie { get; set; }
+        [Column("MaPhim")]
+        public int? IDMovie { get; set; }
        
-        [Column("MovieName")]
+        [Column("TenPhim")]
         [MaxLength(255)]
         public string MovieName { get; set; }
 
-        [Column("Genre")]
+        [Column("TheLoai")]
         [MaxLength(50)]
         public string Genre { get; set; }
 
-        [Column("Duration")]
+        [Column("ThoiLuong")]
         public int Duration { get; set; }
 
-        [Column("Description")]
+        [Column("MoTa")]
         public string Description { get; set; }
 
-        [Column("Director")]
+        [Column("DaoDien")]
         [MaxLength(50)]
         public string Director { get; set; }
 
-        [Column("ReleaseDate")]
+        [Column("NgayKhoiChieu")]
         public DateTime ReleaseDate { get; set; }
 
-        [Column("CoverURL")]
+        [Column("BiaURL")]
         public string CoverURL { get; set; }
 
         [Column("TrailerURL")]
         public string TrailerURL { get; set; }
+
+        [Column("GioiHanTuoi")]
+        public string AgeRestriction { get; set; }
+
+        [Column("NhaSanXuat")]
+        public string Producer { get; set; }
+
+        [Column("DienVien")]
+        public string Actors { get; set; }
     }
 }

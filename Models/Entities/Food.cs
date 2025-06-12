@@ -3,26 +3,26 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace API_Project.Models.Entities
 {
-    [Table("Food")]
+    [Table("DoAn")]
     public class Food
     {
         [Key]
-        [Column("IDFood")]
+        [Column("MaDoAn")]
         public int IDFood { get; set; }
 
-        [Column("FoodName")]
+        [Column("TenDoAn")]
         public string FoodName { get; set; }
 
-        [Column("Description")]
+        [Column("MoTa")]
         public string Description { get; set; }
 
-        [Column("Price")]
+        [Column("GiaTien")]
         public Decimal Price { get; set; }
 
-        [Column("ImageURL")]
+        [Column("URL")]
         public string ImageURL { get; set; }
 
-        [Column("CinemaID")]
+        [Column("MaRap")]
         public int CinemaID { get; set; }
     }
 }

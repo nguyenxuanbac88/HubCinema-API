@@ -4,22 +4,22 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace API_Project.Models.Entities
 {
-    [Table("Cinemas")]
+    [Table("RapPhim")]
     public class Cinema
     {
         [Key]
-        [Column("IDCinema")]
+        [Column("MaRap")]
         public int IDCinema { get; set; }
 
-        [Column("CinemaName")]
+        [Column("TenRap")]
         [MaxLength(255)]
         public string CinemaName { get; set; }
 
-        [Column("Address")]
+        [Column("DiaChi")]
         public string Address { get; set; }
 
 
-        [Column("City")]
+        [Column("ThanhPho")]
         [MaxLength(255)]
         public string City { get; set; }
 

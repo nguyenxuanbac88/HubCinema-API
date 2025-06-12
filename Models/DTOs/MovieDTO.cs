@@ -11,5 +11,8 @@
         public DateTime ReleaseDate { get; set; }
         public string CoverURL { get; set; }
         public string TrailerURL { get; set; }
+        public string AgeRestriction { get; set; }
+        public string Producer { get; set; }
+        public string Actors { get; set; }
     }
 }

@@ -5,8 +5,8 @@
         public int IDRoom { get; set; }
         public int CinemaID { get; set; }
         public string RoomName { get; set; }
-        public int TotalSeats { get; set; }
-        public int TicketPriceID { get; set; }
-        public string ImageURL { get; set; }
+        public int RoomType { get; set; }
+        public string RoomImageURL { get; set; }
+        public bool Status { get; set; }
     }
 }
