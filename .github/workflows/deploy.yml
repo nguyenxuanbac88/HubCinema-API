@@ -29,6 +29,15 @@ jobs:
     - name: Publish
       run: dotnet publish API_Project.csproj -c Release -o publish --no-build
 
+    - name: Stop IIS before deploy
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USER }}
+        password: ${{ secrets.SERVER_PASSWORD }}
+        port: 22
+        script: iisreset /stop
+
     - name: Deploy to Windows Server via SCP
       uses: appleboy/scp-action@v0.1.4
       with:
@@ -38,4 +47,14 @@ jobs:
         port: 22
         source: "publish/"
         target: "C:/Deploy/HubCinemaApi"
-        rm: true
+        overwrite: true
+        strip_components: 1
+
+    - name: Start IIS after deploy
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USER }}
+        password: ${{ secrets.SERVER_PASSWORD }}
+        port: 22
+        script: iisreset /start
