@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
@@ -19,7 +19,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '9.0.101' 
+        dotnet-version: '8.0.x'
 
     - name: Restore dependencies
       run: dotnet restore
