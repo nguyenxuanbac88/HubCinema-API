@@ -38,3 +38,4 @@ jobs:
         port: 22
         source: "publish/"
         target: "C:/Deploy/HubCinemaApi"
+        rm: true
