@@ -24,10 +24,10 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build HubCinema.API/HubCinema.API.csproj --configuration Release --no-restore
+      run: dotnet build API_Project.csproj --configuration Release --no-restore
 
     - name: Publish
-      run: dotnet publish HubCinema.API/HubCinema.API.csproj -c Release -o publish --no-build
+      run: dotnet publish API_Project.csproj -c Release -o publish --no-build
 
     - name: Deploy to Windows Server via SCP
       uses: appleboy/scp-action@v0.1.4
