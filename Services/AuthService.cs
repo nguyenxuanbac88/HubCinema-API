@@ -46,22 +46,23 @@ namespace API_Project.Services
             string hashedPassword = PasswordHasher.HashPassword(model.password).Trim();
             var user = new User
             {
-                Phone = model.phone,
-                Email = model.email,
+                Phone = model.phone?.Trim(),
+                Email = model.email?.Trim(),
                 Password = hashedPassword,
                 FullName = model.name,
                 Dob = model.dob,
-                Gender = model.gender,
+                Gender = Convert.ToBoolean(model.gender),
                 ZoneAddress = model.zoneAddress,
                 Role = 0,
                 Points = 0,
                 TotalSpending = 0
             };
+
             _db.Users.Add(user);
             _db.SaveChanges();
 
             //Thêm lớp ảo ID cho User
-            user.UserCode = GenerateUserCode(user.IDUser);
+            user.MaBarcode = GenerateUserCode(user.IDUser);
             _db.SaveChanges();
             return RegisterResult.Success;
         }
