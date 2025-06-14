@@ -74,6 +74,16 @@ namespace API_Project.Services
             return msCut + idUser.ToString();
         }
 
+        public bool FogotPassword(FogotPasswordDTO model)
+        {
+            var user = _db.Users.FirstOrDefault(u => u.Phone.Trim() == model.UserName.Trim() || u.Email == model.UserName.Trim());
+            if (user == null)
+                return false;
+            var otp = GenerateOTP.GenerateUserOTP().Trim();
+            user.OTP= otp;
+            _db.SaveChanges();
+            return true;
+        }
 
     }
 }

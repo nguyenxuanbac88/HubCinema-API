@@ -61,6 +61,8 @@ namespace API_Project.Models.Entities
 
         [Column("KhuVuc")]
         public string? ZoneAddress { get; set; }
+        [Column("Otp")]
+        public string? OTP { get; set; }
 
     }
 }
