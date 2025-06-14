@@ -47,7 +47,6 @@ jobs:
         port: 22
         source: "publish/"
         target: "C:/Deploy/HubCinemaApi"
-        overwrite: true
         strip_components: 1
 
     - name: Start IIS after deploy
