@@ -20,6 +20,7 @@ public class PublicService
         var movies = await _context.Movies
             .Select(m => new MovieDTO
             {
+                IDMovie = m.IDMovie,
                 MovieName = m.MovieName,
                 Genre = m.Genre,
                 Duration = m.Duration,
@@ -35,6 +36,25 @@ public class PublicService
             .ToListAsync();
 
         return movies;
+    }
+    public async Task<bool> CreateCinema(CinemaDTO cinemaDTO)
+    {
+        try
+        {
+            var cinema = new Cinema
+            {
+                CinemaName = cinemaDTO.CinemaName,
+                Address = cinemaDTO.Address,
+                City = cinemaDTO.City
+            };
+            _context.Cinemas.Add(cinema);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
     public async Task<bool> CreateMovie(MovieDTO movieDTO)
     {
@@ -107,12 +127,41 @@ public class PublicService
             .ToListAsync();
         return rooms;
     }
+    public async Task<CinemaDTO?> GetCinemaByIdAsync(int id)
+    {
+        var cinema = await _context.Cinemas
+            .Where(c => c.IDCinema == id)
+            .Select(c => new CinemaDTO
+            {
+                IDCinema = c.IDCinema,
+                CinemaName = c.CinemaName,
+                Address = c.Address,
+                City = c.City
+            })
+            .FirstOrDefaultAsync();
+        return cinema;
+    } 
+    public async Task<bool> UpdateCinema(int id, CinemaDTO cinemaDTO)
+    {
+        var cinema = await _context.Cinemas.FindAsync(id);
+        if(cinema == null)
+        {
+            return false;
+        }
+        cinema.CinemaName = cinemaDTO.CinemaName;
+        cinema.Address = cinemaDTO.Address;
+        cinema.City = cinemaDTO.City;
+        _context.Cinemas.Update(cinema);
+        await _context.SaveChangesAsync();
+        return true;
+    }
     public async Task<MovieDTO?> GetMovieByIdAsync(int id)
     {
         var movie = await _context.Movies
             .Where(m => m.IDMovie == id)
             .Select(m => new MovieDTO
             {
+                IDMovie = m.IDMovie,
                 MovieName = m.MovieName,
                 Genre = m.Genre,
                 Duration = m.Duration,

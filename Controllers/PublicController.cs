@@ -108,6 +108,27 @@ namespace API_Project.Controllers
                 });
             }
         }
-      
+        [HttpGet("GetCinemaById/{id}")]
+        public async Task<IActionResult> GetCinemaById(int id)
+        {
+            try
+            {
+                var cinema = await _publicService.GetCinemaByIdAsync(id);
+                if (cinema == null)
+                {
+                    return NotFound(new { message = "Cinema not found" });
+                }
+                return Ok(cinema);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Internal server error",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
     }
 }

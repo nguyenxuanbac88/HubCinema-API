@@ -41,5 +41,34 @@ namespace API_Project.Controllers
                 });
             }
         }
+        [HttpPut("UpdateCinema/{id}")]
+        public async Task<IActionResult> UpdateCinema(int id, [FromBody] CinemaDTO cinemaDTO)
+        {
+            if (cinemaDTO == null)
+            {
+                return BadRequest("Cinema data is null");
+            }
+            try
+            {
+                var result = await _publicService.UpdateCinema(id, cinemaDTO);
+                if (result)
+                {
+                    return Ok(new { message = "Cinema updated successfully" });
+                }
+                else
+                {
+                    return NotFound(new { message = "Cinema not found" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Internal server error",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
     }
 }
