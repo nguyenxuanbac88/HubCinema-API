@@ -20,6 +20,7 @@ public class PublicService
         var movies = await _context.Movies
             .Select(m => new MovieDTO
             {
+                IDMovie = m.IDMovie,
                 MovieName = m.MovieName,
                 Genre = m.Genre,
                 Duration = m.Duration,
