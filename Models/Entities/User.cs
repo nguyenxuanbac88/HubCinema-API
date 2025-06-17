@@ -64,5 +64,7 @@ namespace API_Project.Models.Entities
         [Column("Otp")]
         public string? OTP { get; set; }
 
+        [Column("TimeOtp")]
+        public long? TimeOtp { get; set; }
     }
 }

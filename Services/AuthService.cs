@@ -1,8 +1,10 @@
 ﻿using API_Project.Data;
 using API_Project.Enums;
 using API_Project.Helpers;
+using API_Project.Services;
 using API_Project.Models.DTOs;
 using API_Project.Models.Entities;
+using API_Project.Models;
 
 namespace API_Project.Services
 {
@@ -10,11 +12,13 @@ namespace API_Project.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly JwtTokenGenerator _tokenGenerator;
+        private readonly EmailService _emailService;
 
-        public AuthService(ApplicationDbContext db, JwtTokenGenerator tokenGenerator)
+        public AuthService(ApplicationDbContext db, JwtTokenGenerator tokenGenerator, EmailService emailService)
         {
             _db = db;
             _tokenGenerator = tokenGenerator;
+            _emailService = emailService;
         }
 
         public string Login(LoginDTO model)
@@ -26,24 +30,24 @@ namespace API_Project.Services
                 return null;
 
             if (!PasswordHasher.VerifyPassword(model.Password.Trim(), user.Password.Trim()))
-            return null;
+                return null;
 
             string roleName = ((UserRole)user.Role).ToString();
             return _tokenGenerator.GenerateToken(user.Phone, roleName);
         }
+
         public RegisterResult Register(RegisterDTO model)
         {
-            //Check độ tuổi đăng ký, phải đủ 12 tuổi bao gồm cả ngày
             var age = DateTime.Now.Year - model.dob.Year;
             if (DateTime.Now.Date < model.dob.Date.AddYears(age)) age--;
-            if(age<12)
+            if (age < 12)
                 return RegisterResult.Underage;
-            //Kiểm tra SDT và Email đã tồn tại trong CSDL chưa ?
-            if (_db.Users.Any(u=> u.Phone.Trim() == model.phone.Trim() || u.Email.Trim() == model.email.Trim()))
+
+            if (_db.Users.Any(u => u.Phone.Trim() == model.phone.Trim() || u.Email.Trim() == model.email.Trim()))
                 return RegisterResult.PhoneOrEmailExists;
 
-            //Dùng hàm mã hoá để mã hoá mật khẩu
             string hashedPassword = PasswordHasher.HashPassword(model.password).Trim();
+
             var user = new User
             {
                 Phone = model.phone?.Trim(),
@@ -61,11 +65,12 @@ namespace API_Project.Services
             _db.Users.Add(user);
             _db.SaveChanges();
 
-            //Thêm lớp ảo ID cho User
             user.MaBarcode = GenerateUserCode(user.IDUser);
             _db.SaveChanges();
+
             return RegisterResult.Success;
         }
+
         private string GenerateUserCode(int idUser)
         {
             var ms = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -76,14 +81,52 @@ namespace API_Project.Services
 
         public bool FogotPassword(FogotPasswordDTO model)
         {
-            var user = _db.Users.FirstOrDefault(u => u.Phone.Trim() == model.UserName.Trim() || u.Email == model.UserName.Trim());
-            if (user == null)
+            string subject = "Mã OTP HubCinema";
+
+            var user = _db.Users
+                  .FirstOrDefault(u => u.Phone.Trim() == model.Username.Trim() || u.Email.Trim() == model.Username.Trim());
+            if (user == null || !EmailValidator.IsValidEmail(model.Username))
                 return false;
+
             var otp = GenerateOTP.GenerateUserOTP().Trim();
-            user.OTP= otp;
+
+            string body = $@"
+                <div style='font-family: Arial, sans-serif; line-height: 1.6;'>
+                    <h2>HubCinema - Xác nhận tài khoản</h2>
+                    <p>Xin chào <b>{user.FullName}</b>,</p>
+                    <p>Bạn (hoặc ai đó) đã yêu cầu đặt lại mật khẩu cho tài khoản HubCinema của bạn.</p>
+                    <p>Mã OTP của bạn là:</p>
+                    <h3 style='color: #e91e63;'>{otp}</h3>
+                    <p>Mã này có hiệu lực trong vòng <b>15 phút</b>.</p>
+                    <p>Nếu bạn không yêu cầu điều này, hãy bỏ qua email này.</p>
+                    <br/>
+                    <p>Trân trọng,<br/>HubCinema</p>
+                </div>";
+
+            _emailService.SendEmail(model.Username, subject, body);
+
+            user.OTP = PasswordHasher.HashPassword(otp).Trim();
+            user.TimeOtp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             _db.SaveChanges();
             return true;
         }
+        public bool ConfirmPW(ConfirmPwDTO model)
+        {
+            var user = _db.Users
+                  .FirstOrDefault(u => u.Phone.Trim() == model.Username.Trim() || u.Email.Trim() == model.Username.Trim());
+            long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            if (user == null)
+                return false;
 
+            if (user.OTP != PasswordHasher.HashPassword(model.OTP))
+                return false;
+
+            bool isExpired = (now - user.TimeOtp) > (15 * 60 * 1000);
+            if (isExpired == true)
+                return false;
+            user.Password = PasswordHasher.HashPassword(model.NewPW);
+            _db.SaveChanges();
+            return true;
+        }
     }
 }
