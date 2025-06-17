@@ -37,6 +37,25 @@ public class PublicService
 
         return movies;
     }
+    public async Task<bool> CreateCinema(CinemaDTO cinemaDTO)
+    {
+        try
+        {
+            var cinema = new Cinema
+            {
+                CinemaName = cinemaDTO.CinemaName,
+                Address = cinemaDTO.Address,
+                City = cinemaDTO.City
+            };
+            _context.Cinemas.Add(cinema);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
     public async Task<bool> CreateMovie(MovieDTO movieDTO)
     {
         try

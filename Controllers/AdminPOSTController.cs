@@ -41,5 +41,34 @@ namespace API_Project.Controllers
                 });
             }
         }
+        [HttpPost("CreateCinema")]
+        public async Task<IActionResult> CreateCinema([FromBody] CinemaDTO cinemaDTO)
+        {
+            if (cinemaDTO == null)
+            {
+                return BadRequest("Movie data is null");
+            }
+            try
+            {
+                var result = await _publicService.CreateCinema(cinemaDTO);
+                if (result)
+                {
+                    return Ok(new { message = "Movie created successfully" });
+                }
+                else
+                {
+                    return StatusCode(500, "Failed to create movie");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Internal server error",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
     }
 }
