@@ -1,5 +1,4 @@
-
-using API_Project.Data;
+﻿using API_Project.Data;
 using API_Project.Helpers;
 using API_Project.Models;
 using API_Project.Services;
@@ -11,17 +10,29 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+// Nếu dùng Razor View + API, dùng dòng này:
+builder.Services.AddControllersWithViews(options =>
+{
+    options.ModelBinderProviders.Insert(0, new TrimmingModelBinderProvider());
+});
 
-builder.Services.AddControllersWithViews(); 
+// Nếu chỉ dùng API, thì dùng dòng này và bỏ dòng trên:
+// builder.Services.AddControllers(options =>
+// {
+//     options.ModelBinderProviders.Insert(0, new TrimmingModelBinderProvider());
+// });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddSingleton<JwtTokenGenerator>();
 builder.Services.AddScoped<PublicService>();
-builder.Services.Configure<EmailSettings>(
-    builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<Profile>();
 builder.Services.AddTransient<EmailService>();
 
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
 
 var app = builder.Build();
 

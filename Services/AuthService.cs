@@ -33,7 +33,10 @@ namespace API_Project.Services
                 return null;
 
             string roleName = ((UserRole)user.Role).ToString();
-            return _tokenGenerator.GenerateToken(user.Phone, roleName);
+            string toKen = _tokenGenerator.GenerateToken(user.Phone, roleName);
+            user.TokenLogin = toKen;
+            _db.SaveChanges();
+            return toKen;
         }
 
         public RegisterResult Register(RegisterDTO model)
@@ -65,7 +68,7 @@ namespace API_Project.Services
             _db.Users.Add(user);
             _db.SaveChanges();
 
-            user.MaBarcode = GenerateUserCode(user.IDUser);
+            user.MaBarcode = GenerateUserCode(user.IDUser).Trim();
             _db.SaveChanges();
 
             return RegisterResult.Success;
