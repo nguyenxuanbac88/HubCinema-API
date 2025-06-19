@@ -94,6 +94,7 @@ public class PublicService
                 Description = m.Description,
                 Price = m.Price,
                 ImageURL = m.ImageURL,
+                IDCinema = m.CinemaID,
             })
             .ToListAsync();
 
