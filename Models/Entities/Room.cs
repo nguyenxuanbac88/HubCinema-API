@@ -7,6 +7,7 @@ namespace API_Project.Models.Entities
     public class Room
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("MaPhong")]
         public int IDRoom { get; set; }
 
