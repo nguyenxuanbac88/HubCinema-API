@@ -8,6 +8,7 @@ using API_Project.Models.DTOs;
 using API_Project.Enums;
 using API_Project.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 namespace API_Project.Services
 {
@@ -43,18 +44,21 @@ namespace API_Project.Services
             );
         }
 
-        // ✅ Get Info (giữ nguyên IActionResult vì chứa object trả về chi tiết)
-        public async Task<IActionResult> HandleGetUserInfoAsync(string token)
+        // ✅ Sửa lại: Lấy token từ Header "Authorization: Bearer ..."
+        public async Task<IActionResult> HandleGetUserInfoAsync(HttpContext httpContext)
         {
-            if (string.IsNullOrWhiteSpace(token))
-                return new Microsoft.AspNetCore.Mvc.BadRequestObjectResult("Thiếu token");
+            var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer "))
+                return new BadRequestObjectResult("Thiếu token hoặc định dạng không đúng");
+
+            var token = authHeader.Substring("Bearer ".Length).Trim();
 
             var user = await GetUserFromTokenAsync(token);
 
             if (user == null)
-                return new Microsoft.AspNetCore.Mvc.UnauthorizedObjectResult("Token không hợp lệ hoặc người dùng không tồn tại");
+                return new UnauthorizedObjectResult("Token không hợp lệ hoặc người dùng không tồn tại");
 
-            return new Microsoft.AspNetCore.Mvc.OkObjectResult(new
+            return new OkObjectResult(new
             {
                 user.IDUser,
                 user.MaBarcode,
@@ -70,7 +74,7 @@ namespace API_Project.Services
             });
         }
 
-        // ✅ Change password: Trả về enum + message
+        // Đổi mật khẩu giữ nguyên
         public async Task<(ChangePasswordResult result, string message)> ChangePasswordAsync(ChangePwDTO model)
         {
             if (model == null || string.IsNullOrWhiteSpace(model.Token) ||

@@ -1,13 +1,12 @@
-﻿using API_Project.Enums;
-using API_Project.Models.DTOs;
+﻿using API_Project.Models.DTOs;
 using API_Project.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API_Project.Controllers
 {
     [ApiController]
-    [Route("api/user")]
-    public class UserController : ControllerBase
+    [Route("Api/User")]
+    public class UserController : Controller
     {
         private readonly Profile _profileService;
 
@@ -16,26 +15,18 @@ namespace API_Project.Controllers
             _profileService = profileService;
         }
 
-        [HttpGet("get-info/{token}")]
-        public async Task<IActionResult> GetInfo(string token)
+        [HttpGet("GetInfo")]
+        public async Task<IActionResult> GetInfo()
         {
-            return await _profileService.HandleGetUserInfoAsync(token);
+            var result = await _profileService.HandleGetUserInfoAsync(HttpContext);
+            return result;
         }
 
-        [HttpPost("change-password")]
+        [HttpPost("ChangePw")]
         public async Task<IActionResult> ChangePw([FromBody] ChangePwDTO model)
         {
-            var (result, message) = await _profileService.ChangePasswordAsync(model);
-
-            return result switch
-            {
-                ChangePasswordResult.Success => Ok(new { message }),
-                ChangePasswordResult.MissingInput => BadRequest(message),
-                ChangePasswordResult.InvalidToken => Unauthorized(message),
-                ChangePasswordResult.WrongOldPassword => BadRequest(message),
-                ChangePasswordResult.InvalidNewPassword => BadRequest(message),
-                _ => StatusCode(500, "Có lỗi xảy ra khi đổi mật khẩu.")
-            };
+            var (status, message) = await _profileService.ChangePasswordAsync(model);
+            return Ok(new { status, message });
         }
     }
 }
