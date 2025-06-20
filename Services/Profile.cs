@@ -75,16 +75,23 @@ namespace API_Project.Services
         }
 
         // Đổi mật khẩu giữ nguyên
-        public async Task<(ChangePasswordResult result, string message)> ChangePasswordAsync(ChangePwDTO model)
+        public async Task<(ChangePasswordResult result, string message)> ChangePasswordAsync(ChangePwDTO model, HttpContext httpContext)
         {
-            if (model == null || string.IsNullOrWhiteSpace(model.Token) ||
+            if (model == null ||
                 string.IsNullOrWhiteSpace(model.OldPassword) ||
                 string.IsNullOrWhiteSpace(model.NewPassword))
             {
                 return (ChangePasswordResult.MissingInput, "Thiếu thông tin đầu vào.");
             }
 
-            var user = await GetUserFromTokenAsync(model.Token);
+            // ✅ Lấy token từ header
+            var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer "))
+                return (ChangePasswordResult.InvalidToken, "Thiếu token hoặc định dạng không hợp lệ.");
+
+            var token = authHeader.Substring("Bearer ".Length).Trim();
+
+            var user = await GetUserFromTokenAsync(token);
             if (user == null)
             {
                 return (ChangePasswordResult.InvalidToken, "Token không hợp lệ hoặc người dùng không tồn tại.");
@@ -118,5 +125,6 @@ namespace API_Project.Services
 
             return (ChangePasswordResult.Success, "Đổi mật khẩu thành công!");
         }
+
     }
 }

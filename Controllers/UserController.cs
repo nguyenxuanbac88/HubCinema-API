@@ -25,8 +25,9 @@ namespace API_Project.Controllers
         [HttpPost("ChangePw")]
         public async Task<IActionResult> ChangePw([FromBody] ChangePwDTO model)
         {
-            var (status, message) = await _profileService.ChangePasswordAsync(model);
+            var (status, message) = await _profileService.ChangePasswordAsync(model, HttpContext);
             return Ok(new { status, message });
         }
+
     }
 }
