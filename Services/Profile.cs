@@ -3,9 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using API_Project.Data;
-using API_Project.Models;
 using API_Project.Models.Entities;
-using System;
+using API_Project.Models.DTOs;
+using API_Project.Enums;
+using API_Project.Helpers;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API_Project.Services
 {
@@ -18,7 +20,6 @@ namespace API_Project.Services
             _db = db;
         }
 
-        // Lấy username (phone/email) từ JWT token
         public string GetUsernameFromToken(string token)
         {
             var handler = new JwtSecurityTokenHandler();
@@ -30,19 +31,88 @@ namespace API_Project.Services
             return username;
         }
 
-        // Lấy thông tin người dùng từ token và kiểm tra Token có khớp với DB không
         public async Task<User> GetUserFromTokenAsync(string token)
         {
             var username = GetUsernameFromToken(token);
             if (string.IsNullOrEmpty(username))
                 return null;
 
-            var user = await _db.Users.FirstOrDefaultAsync(u =>
+            return await _db.Users.FirstOrDefaultAsync(u =>
                 (u.Phone == username || u.Email == username) &&
                 u.TokenLogin == token
             );
+        }
 
-            return user;
+        // ✅ Get Info (giữ nguyên IActionResult vì chứa object trả về chi tiết)
+        public async Task<IActionResult> HandleGetUserInfoAsync(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+                return new Microsoft.AspNetCore.Mvc.BadRequestObjectResult("Thiếu token");
+
+            var user = await GetUserFromTokenAsync(token);
+
+            if (user == null)
+                return new Microsoft.AspNetCore.Mvc.UnauthorizedObjectResult("Token không hợp lệ hoặc người dùng không tồn tại");
+
+            return new Microsoft.AspNetCore.Mvc.OkObjectResult(new
+            {
+                user.IDUser,
+                user.MaBarcode,
+                user.FullName,
+                user.Phone,
+                user.Email,
+                Dob = user.Dob.ToString("yyyy-MM-dd"),
+                Gender = user.Gender ? "Nam" : "Nữ",
+                Diem = user.Points,
+                TongChiTieu = user.TotalSpending,
+                ThuHang = user.Rank,
+                KhuVuc = user.ZoneAddress
+            });
+        }
+
+        // ✅ Change password: Trả về enum + message
+        public async Task<(ChangePasswordResult result, string message)> ChangePasswordAsync(ChangePwDTO model)
+        {
+            if (model == null || string.IsNullOrWhiteSpace(model.Token) ||
+                string.IsNullOrWhiteSpace(model.OldPassword) ||
+                string.IsNullOrWhiteSpace(model.NewPassword))
+            {
+                return (ChangePasswordResult.MissingInput, "Thiếu thông tin đầu vào.");
+            }
+
+            var user = await GetUserFromTokenAsync(model.Token);
+            if (user == null)
+            {
+                return (ChangePasswordResult.InvalidToken, "Token không hợp lệ hoặc người dùng không tồn tại.");
+            }
+
+            if (user.Password != model.OldPassword)
+            {
+                return (ChangePasswordResult.WrongOldPassword, "Mật khẩu cũ không chính xác.");
+            }
+
+            var pwStatus = CheckAuth.CheckPassword(model.NewPassword);
+            if (pwStatus != PasswordCheckResult.Valid)
+            {
+                string msg = pwStatus switch
+                {
+                    PasswordCheckResult.TooShort => "Mật khẩu quá ngắn (tối thiểu 7 ký tự).",
+                    PasswordCheckResult.TooLong => "Mật khẩu quá dài (tối đa 16 ký tự).",
+                    PasswordCheckResult.MissingUppercase => "Phải có ít nhất một chữ in hoa.",
+                    PasswordCheckResult.MissingLowercase => "Phải có ít nhất một chữ thường.",
+                    PasswordCheckResult.MissingDigit => "Phải có ít nhất một số.",
+                    PasswordCheckResult.MissingSpecialChar => "Phải có ít nhất một ký tự đặc biệt.",
+                    PasswordCheckResult.ContainsInvalidChar => "Mật khẩu chứa ký tự không hợp lệ.",
+                    _ => "Mật khẩu không hợp lệ."
+                };
+
+                return (ChangePasswordResult.InvalidNewPassword, msg);
+            }
+
+            user.Password = model.NewPassword;
+            await _db.SaveChangesAsync();
+
+            return (ChangePasswordResult.Success, "Đổi mật khẩu thành công!");
         }
     }
 }

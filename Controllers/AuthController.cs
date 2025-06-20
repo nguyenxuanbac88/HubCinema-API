@@ -1,5 +1,5 @@
-﻿using API_Project.Models.DTOs;
-using API_Project.Models.Entities;
+﻿using API_Project.Enums;
+using API_Project.Models.DTOs;
 using API_Project.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,50 +19,60 @@ namespace API_Project.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginDTO model)
         {
-            var token = _authService.Login(model);
+            var (result, token) = _authService.Login(model);
 
-            if (token == null)
-                return Unauthorized("Sai tên đăng nhập hoặc mật khẩu");
-
-            return Ok(new { token });
+            return result switch
+            {
+                AuthResult.Success => Ok(new { token }),
+                AuthResult.InvalidCredentials => Unauthorized("Sai tên đăng nhập hoặc mật khẩu."),
+                _ => StatusCode(500, "Có lỗi xảy ra trong quá trình đăng nhập.")
+            };
         }
 
         [HttpPost("register")]
         public IActionResult Register([FromBody] RegisterDTO model)
         {
             var result = _authService.Register(model);
-            switch (result)
+
+            return result switch
             {
-                case Enums.RegisterResult.Underage:
-                    return BadRequest("Bạn chưa đủ 12 tuổi để đăng ký.");
-                case Enums.RegisterResult.PhoneOrEmailExists:
-                    return BadRequest("Số điện thoại hoặc email đã tồn tại.");
-                case Enums.RegisterResult.Success:
-                    return Ok(new { message = "Đăng ký thành công!" });
-                default:
-                    return StatusCode(500, "Có lỗi xảy ra.");
-            }
+                RegisterResult.Success => Ok(new { message = "Đăng ký thành công!" }),
+                RegisterResult.Underage => BadRequest("Bạn chưa đủ 12 tuổi để đăng ký."),
+                RegisterResult.InvalidEmail => BadRequest("Email không đúng định dạng."),
+                RegisterResult.InvalidPhone => BadRequest("Số điện thoại không hợp lệ."),
+                RegisterResult.InvalidPassword => BadRequest("Mật khẩu không đúng định dạng."),
+                RegisterResult.AccountExists => BadRequest("Số điện thoại hoặc email đã tồn tại."),
+                _ => StatusCode(500, "Có lỗi xảy ra trong quá trình đăng ký.")
+            };
         }
 
         [HttpPost("forgot-password")]
         public IActionResult ForgotPassword([FromBody] FogotPasswordDTO model)
         {
-            bool result = _authService.FogotPassword(model);
+            var result = _authService.FogotPassword(model);
 
-            if (!result)
-                return BadRequest("Tài khoản không hợp lệ hoặc email không đúng định dạng.");
-
-            return Ok(new { message = "Mã OTP đã được gửi đến email của bạn." });
+            return result switch
+            {
+                AuthResult.Success => Ok(new { message = "Mã OTP đã được gửi đến email của bạn." }),
+                AuthResult.UserNotFound => NotFound("Không tìm thấy người dùng."),
+                AuthResult.EmailInvalid => BadRequest("Email không đúng định dạng."),
+                _ => StatusCode(500, "Gửi mã OTP thất bại.")
+            };
         }
+
         [HttpPost("confirm-password")]
         public IActionResult ConfirmPassword([FromBody] ConfirmPwDTO model)
         {
-            bool result = _authService.ConfirmPW(model);
+            var result = _authService.ConfirmPW(model);
 
-            if (!result)
-                return BadRequest("Sai mã OTP hoặc mã OTP đã hết hạn");
-
-            return Ok(new { message = "Đổi mật khẩu thành công" });
+            return result switch
+            {
+                AuthResult.Success => Ok(new { message = "Đổi mật khẩu thành công." }),
+                AuthResult.UserNotFound => NotFound("Tài khoản không tồn tại."),
+                AuthResult.OtpInvalid => BadRequest("Mã OTP không đúng."),
+                AuthResult.OtpExpired => BadRequest("Mã OTP đã hết hạn."),
+                _ => StatusCode(500, "Xác nhận đổi mật khẩu thất bại.")
+            };
         }
     }
 }

@@ -1,10 +1,10 @@
 ﻿using API_Project.Data;
 using API_Project.Enums;
 using API_Project.Helpers;
-using API_Project.Services;
 using API_Project.Models.DTOs;
 using API_Project.Models.Entities;
-using API_Project.Models;
+using System;
+using System.Linq;
 
 namespace API_Project.Services
 {
@@ -21,40 +21,58 @@ namespace API_Project.Services
             _emailService = emailService;
         }
 
-        public string Login(LoginDTO model)
+        public (AuthResult result, string token) Login(LoginDTO model)
         {
             var user = _db.Users
-                .FirstOrDefault(u => u.Phone.Trim() == model.Username.Trim() || u.Email.Trim() == model.Username.Trim());
+                .FirstOrDefault(u => u.Phone == model.Username || u.Email == model.Username);
 
-            if (user == null)
-                return null;
-
-            if (!PasswordHasher.VerifyPassword(model.Password.Trim(), user.Password.Trim()))
-                return null;
+            if (user == null || !PasswordHasher.VerifyPassword(model.Password, user.Password))
+                return (AuthResult.InvalidCredentials, null);
 
             string roleName = ((UserRole)user.Role).ToString();
-            string toKen = _tokenGenerator.GenerateToken(user.Phone, roleName);
-            user.TokenLogin = toKen;
+            string token = _tokenGenerator.GenerateToken(user.Phone, roleName);
+
+            user.TokenLogin = token;
             _db.SaveChanges();
-            return toKen;
+
+            return (AuthResult.Success, token);
         }
 
         public RegisterResult Register(RegisterDTO model)
         {
-            var age = DateTime.Now.Year - model.dob.Year;
-            if (DateTime.Now.Date < model.dob.Date.AddYears(age)) age--;
+            // Kiểm tra tuổi
+            int age = DateTime.Today.Year - model.dob.Year;
+            if (model.dob.Date > DateTime.Today.AddYears(-age)) age--;
             if (age < 12)
                 return RegisterResult.Underage;
 
-            if (_db.Users.Any(u => u.Phone.Trim() == model.phone.Trim() || u.Email.Trim() == model.email.Trim()))
-                return RegisterResult.PhoneOrEmailExists;
+            // Kiểm tra email
+            var emailStatus = CheckAuth.CheckEmail(model.email);
+            if (emailStatus != EmailCheckResult.Valid)
+                return RegisterResult.InvalidEmail;
 
-            string hashedPassword = PasswordHasher.HashPassword(model.password).Trim();
+            // Kiểm tra số điện thoại
+            var phoneStatus = CheckAuth.CheckPhoneNumber(model.phone);
+            if (phoneStatus != PhoneCheckResult.Valid)
+                return RegisterResult.InvalidPhone;
+
+            // Kiểm tra mật khẩu
+            var pwStatus = CheckAuth.CheckPassword(model.password);
+            if (pwStatus != PasswordCheckResult.Valid)
+                return RegisterResult.InvalidPassword;
+
+            // Kiểm tra tài khoản tồn tại
+            var exists = _db.Users.Any(u => u.Email == model.email || u.Phone == model.phone);
+            if (exists)
+                return RegisterResult.AccountExists;
+
+            // Mã hoá mật khẩu
+            string hashedPassword = PasswordHasher.HashPassword(model.password);
 
             var user = new User
             {
-                Phone = model.phone?.Trim(),
-                Email = model.email?.Trim(),
+                Phone = model.phone,
+                Email = model.email,
                 Password = hashedPassword,
                 FullName = model.name,
                 Dob = model.dob,
@@ -68,7 +86,8 @@ namespace API_Project.Services
             _db.Users.Add(user);
             _db.SaveChanges();
 
-            user.MaBarcode = GenerateUserCode(user.IDUser).Trim();
+            // Sinh mã barcode từ IDUser sau khi lưu
+            user.MaBarcode = GenerateUserCode(user.IDUser);
             _db.SaveChanges();
 
             return RegisterResult.Success;
@@ -82,17 +101,21 @@ namespace API_Project.Services
             return msCut + idUser.ToString();
         }
 
-        public bool FogotPassword(FogotPasswordDTO model)
+        public AuthResult FogotPassword(FogotPasswordDTO model)
         {
-            string subject = "Mã OTP HubCinema";
-
             var user = _db.Users
-                  .FirstOrDefault(u => u.Phone.Trim() == model.Username.Trim() || u.Email.Trim() == model.Username.Trim());
-            if (user == null || !EmailValidator.IsValidEmail(model.Username))
-                return false;
+                .FirstOrDefault(u => u.Phone == model.Username || u.Email == model.Username);
 
-            var otp = GenerateOTP.GenerateUserOTP().Trim();
+            if (user == null)
+                return AuthResult.UserNotFound;
 
+            var ResultsEmail = CheckAuth.CheckEmail(model.Username);
+            if ((int)ResultsEmail!=0)
+                return AuthResult.EmailInvalid;
+
+            var otp = GenerateOTP.GenerateUserOTP();
+
+            string subject = "Mã OTP HubCinema";
             string body = $@"
                 <div style='font-family: Arial, sans-serif; line-height: 1.6;'>
                     <h2>HubCinema - Xác nhận tài khoản</h2>
@@ -108,28 +131,32 @@ namespace API_Project.Services
 
             _emailService.SendEmail(model.Username, subject, body);
 
-            user.OTP = PasswordHasher.HashPassword(otp).Trim();
+            user.OTP = PasswordHasher.HashPassword(otp);
             user.TimeOtp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             _db.SaveChanges();
-            return true;
+
+            return AuthResult.Success;
         }
-        public bool ConfirmPW(ConfirmPwDTO model)
+
+        public AuthResult ConfirmPW(ConfirmPwDTO model)
         {
             var user = _db.Users
-                  .FirstOrDefault(u => u.Phone.Trim() == model.Username.Trim() || u.Email.Trim() == model.Username.Trim());
-            long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                .FirstOrDefault(u => u.Phone == model.Username || u.Email == model.Username);
+
             if (user == null)
-                return false;
+                return AuthResult.UserNotFound;
 
             if (user.OTP != PasswordHasher.HashPassword(model.OTP))
-                return false;
+                return AuthResult.OtpInvalid;
 
-            bool isExpired = (now - user.TimeOtp) > (15 * 60 * 1000);
-            if (isExpired == true)
-                return false;
+            bool isExpired = (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - user.TimeOtp) > (15 * 60 * 1000);
+            if (isExpired)
+                return AuthResult.OtpExpired;
+
             user.Password = PasswordHasher.HashPassword(model.NewPW);
             _db.SaveChanges();
-            return true;
+
+            return AuthResult.Success;
         }
     }
 }
