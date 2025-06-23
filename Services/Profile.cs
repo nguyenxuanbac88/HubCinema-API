@@ -97,7 +97,7 @@ namespace API_Project.Services
                 return (ChangePasswordResult.InvalidToken, "Token không hợp lệ hoặc người dùng không tồn tại.");
             }
 
-            if (user.Password != model.OldPassword)
+            if (user.Password != PasswordHasher.HashPassword(model.OldPassword))
             {
                 return (ChangePasswordResult.WrongOldPassword, "Mật khẩu cũ không chính xác.");
             }
@@ -120,7 +120,7 @@ namespace API_Project.Services
                 return (ChangePasswordResult.InvalidNewPassword, msg);
             }
 
-            user.Password = model.NewPassword;
+            user.Password = PasswordHasher.HashPassword(model.NewPassword);
             await _db.SaveChangesAsync();
 
             return (ChangePasswordResult.Success, "Đổi mật khẩu thành công!");

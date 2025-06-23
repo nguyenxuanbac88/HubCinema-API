@@ -145,10 +145,10 @@ namespace API_Project.Services
 
             if (user == null)
                 return AuthResult.UserNotFound;
-
+            //Kiểm tra OTP có khớp không?
             if (user.OTP != PasswordHasher.HashPassword(model.OTP))
                 return AuthResult.OtpInvalid;
-
+            //Kiểm tra token còn hạn không
             bool isExpired = (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - user.TimeOtp) > (15 * 60 * 1000);
             if (isExpired)
                 return AuthResult.OtpExpired;
