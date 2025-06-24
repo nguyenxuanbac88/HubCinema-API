@@ -8,5 +8,18 @@
         WrongOldPassword,
         InvalidNewPassword
     }
+    public enum ChangeEmailResult
+    {
+        SuccessSendEmail,
+        OtpWrong,
+        InvalidToken,
+        Empty,
+        InvalidFormatEmail,
+        SameEmail,
+        EmailAlreadyUsed,
+        SuccessConfirm,
+        OtpInvalid,
+        OtpExpired
+    }
 
 }

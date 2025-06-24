@@ -69,7 +69,7 @@ namespace API_Project.Services
             // Mã hoá mật khẩu
             string hashedPassword = PasswordHasher.HashPassword(model.password);
 
-            var user = new User
+            var user = new Models.Entities.User
             {
                 Phone = model.phone,
                 Email = model.email,
@@ -146,7 +146,8 @@ namespace API_Project.Services
             if (user == null)
                 return AuthResult.UserNotFound;
             //Kiểm tra OTP có khớp không?
-            if (user.OTP != PasswordHasher.HashPassword(model.OTP))
+            //Kiểm tra OTP có khớp không?
+            if (!PasswordHasher.VerifyPassword(model.OTP, user.OTP))
                 return AuthResult.OtpInvalid;
             //Kiểm tra token còn hạn không
             bool isExpired = (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - user.TimeOtp) > (15 * 60 * 1000);
