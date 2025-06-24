@@ -23,24 +23,30 @@ namespace API_Project.Helpers
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+            var issuedAt = DateTime.UtcNow;
+            var expiresInMinutes = int.TryParse(jwtSection["ExpiresInMinutes"], out var exp) ? exp : 60;
+
             var claims = new[]
             {
-            new Claim(ClaimTypes.Name, username),
-            new Claim(ClaimTypes.Role, role)
-        };
-
-            var expiresInMinutes = int.TryParse(jwtSection["ExpiresInMinutes"], out var exp) ? exp : 60;
+        new Claim(ClaimTypes.Name, username),
+        new Claim(ClaimTypes.Role, role),
+        new Claim(JwtRegisteredClaimNames.Iat,
+            new DateTimeOffset(issuedAt).ToUnixTimeSeconds().ToString(),
+            ClaimValueTypes.Integer64)
+    };
 
             var token = new JwtSecurityToken(
                 issuer: jwtSection["Issuer"],
                 audience: jwtSection["Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(expiresInMinutes),
+                notBefore: issuedAt,
+                expires: issuedAt.AddMinutes(expiresInMinutes),
                 signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
     }
 
 }
