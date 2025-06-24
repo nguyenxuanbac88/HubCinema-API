@@ -1,0 +1,17 @@
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace API_Project.Models.DTOs
+{
+    public class ShowtimeDTO
+    {
+        public int MaSuatChieu { get; set; }
+        public int PhongChieu { get; set; }
+        public int MaPhim { get; set; }
+        public DateTime NgayChieu { get; set; }
+        public TimeSpan GioChieu { get; set; }
+        public int ChiPhi { get; set; }
+        public int TypeSuatChieu { get; set; }
+        public int MaRap { get; set; }
+    }
+}
