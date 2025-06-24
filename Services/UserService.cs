@@ -128,7 +128,7 @@ namespace API_Project.Services
 
             return (ChangePasswordResult.Success, "Đổi mật khẩu thành công!");
         }
-        public async Task<(ChangeEmailResult result, string message)> ChangeEmail(ChangeEmailDTO model, HttpContext httpContext)
+        public async Task<(ChangeEmailResult result, string message)> ChangeEmail(ChangeEmailRequestDTO model, HttpContext httpContext)
         {
             var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();
             if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer "))
@@ -186,7 +186,7 @@ namespace API_Project.Services
             await _db.SaveChangesAsync();
             return (ChangeEmailResult.SuccessSendEmail, "Đã gửi OTP về Email mới!");
         }
-        public async Task<(ChangeEmailResult result, string message)> ChangeEmailConfirm(ChangeEmailDTO model, HttpContext httpContext)
+        public async Task<(ChangeEmailResult result, string message)> ChangeEmailConfirm(ChangeEmailConfirmDTO model, HttpContext httpContext)
         {
             var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();
             if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer "))

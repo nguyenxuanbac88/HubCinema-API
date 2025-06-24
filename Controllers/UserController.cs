@@ -32,7 +32,7 @@ namespace API_Project.Controllers
         }
 
         [HttpPost("ChangeEmailRequest")]
-        public async Task<IActionResult> ChangeEmailRequest([FromBody] ChangeEmailDTO model)
+        public async Task<IActionResult> ChangeEmailRequest([FromBody] ChangeEmailRequestDTO model)
         {
             var (result, message) = await _profileService.ChangeEmail(model, HttpContext);
 
@@ -48,7 +48,7 @@ namespace API_Project.Controllers
         }
 
         [HttpPost("ChangeEmailConfirm")]
-        public async Task<IActionResult> ChangeEmailConfirm([FromBody] ChangeEmailDTO model)
+        public async Task<IActionResult> ChangeEmailConfirm([FromBody] ChangeEmailConfirmDTO model)
         {
             var (result, message) = await _profileService.ChangeEmailConfirm(model, HttpContext);
 
