@@ -61,5 +61,11 @@ namespace API_Project.Controllers
                 _ => StatusCode(500, new { result, message = "Lỗi không xác định." })
             };
         }
+        [HttpGet("Logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var result = await _profileService.HandleLogoutAsync(HttpContext);
+            return result;
+        }
     }
 }

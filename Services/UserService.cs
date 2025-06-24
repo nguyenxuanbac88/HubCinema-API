@@ -217,5 +217,22 @@ namespace API_Project.Services
             await _db.SaveChangesAsync();
             return (ChangeEmailResult.SuccessConfirm, "Đổi Email thành công!");
         }
+        public async Task<IActionResult> HandleLogoutAsync(HttpContext httpContext)
+        {
+            var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer "))
+                return new BadRequestObjectResult("Thiếu token hoặc định dạng không đúng");
+
+            var token = authHeader.Substring("Bearer ".Length).Trim();
+
+            var existingToken = await _db.Users.FirstOrDefaultAsync(t => t.TokenLogin == token);
+            if (existingToken != null)
+            {
+                _db.Users.Remove(existingToken);
+                await _db.SaveChangesAsync();
+            }
+
+            return new OkObjectResult(new { message = "Đăng xuất thành công" });
+        }
     }
 }
