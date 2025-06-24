@@ -23,5 +23,7 @@ namespace API_Project.Models.Entities
         [MaxLength(255)]
         public string City { get; set; }
 
+        public ICollection<Room> Rooms { get; set; }
+
     }
 }

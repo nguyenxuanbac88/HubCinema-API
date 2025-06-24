@@ -1,16 +1,19 @@
 ﻿using API_Project.Models.DTOs;
+using API_Project.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API_Project.Controllers
 {
     [ApiController]
-    [Route("api/AdminPUT")]
+    [Route("api/Admin")]
     public class AdminController : Controller
     {
         private readonly PublicService _publicService;
-        public AdminController(PublicService publicService)
+        private readonly PrivateService _privateService;
+        public AdminController(PublicService publicService, PrivateService privateService)
         {
             _publicService = publicService;
+            _privateService = privateService;
         }
         [HttpPut("UpdateMovie/{id}")]
         public async Task<IActionResult> UpdateMovie(int id, [FromBody] MovieDTO movieDTO)
@@ -127,6 +130,18 @@ namespace API_Project.Controllers
                     stackTrace = ex.StackTrace
                 });
             }
+        }
+        [HttpGet("GetRoomsByCinemaName/{nameCinema}")]
+        public async Task<IActionResult> GetRoomsByCinemaName(string nameCinema)
+        {
+            var rooms = await _privateService.GetRoomsByCinemaAsync(nameCinema);
+
+            if (rooms == null || rooms.Count == 0)
+            {
+                return NotFound($"Không tìm thấy phòng chiếu cho rạp có tên: {nameCinema}");
+            }
+
+            return Ok(rooms);
         }
     }
 }

@@ -55,6 +55,8 @@ builder.Services.AddSingleton<JwtTokenGenerator>();
 builder.Services.AddScoped<PublicService>();
 builder.Services.AddScoped<Profile>();
 builder.Services.AddTransient<EmailService>();
+builder.Services.AddScoped<PrivateService>();
+
 
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
