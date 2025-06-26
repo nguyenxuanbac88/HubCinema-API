@@ -53,6 +53,7 @@ namespace API_Project.Helpers
 
             try
             {
+                JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
                 var tokenHandler = new JwtSecurityTokenHandler();
 
                 var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
