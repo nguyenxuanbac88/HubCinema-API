@@ -49,16 +49,21 @@ namespace API_Project.Controllers
         [HttpPost("forgot-password")]
         public IActionResult ForgotPassword([FromBody] FogotPasswordDTO model)
         {
-            var result = _authService.FogotPassword(model);
+            var (result, otpToken) = _authService.ForgotPassword(model);
 
             return result switch
             {
-                AuthResult.Success => Ok(new { message = "Mã OTP đã được gửi đến email của bạn." }),
+                AuthResult.Success => Ok(new
+                {
+                    message = "Mã OTP đã được gửi đến email của bạn.",
+                    otpToken 
+                }),
                 AuthResult.UserNotFound => NotFound("Không tìm thấy người dùng."),
                 AuthResult.EmailInvalid => BadRequest("Email không đúng định dạng."),
                 _ => StatusCode(500, "Gửi mã OTP thất bại.")
             };
         }
+
 
         [HttpPost("confirm-password")]
         public IActionResult ConfirmPassword([FromBody] ConfirmPwDTO model)

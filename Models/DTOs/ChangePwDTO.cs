@@ -14,5 +14,9 @@
         public string OtpToken { get; set; }
     }
 
-
+    public class ChangePwDTO
+    {
+        public string OldPassword { get; set; }
+        public string NewPassword { get; set; }
+    }
 }
