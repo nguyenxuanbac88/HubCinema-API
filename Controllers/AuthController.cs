@@ -74,5 +74,19 @@ namespace API_Project.Controllers
                 _ => StatusCode(500, "Xác nhận đổi mật khẩu thất bại.")
             };
         }
+        [HttpPost("check-otp")]
+        public IActionResult CheckOtp([FromBody] CheckOtpDTO model)
+        {
+            var result = _authService.CheckOtp(model);
+
+            return result switch
+            {
+                OtpResult.Success => Ok(new { message = "Mã OTP hợp lệ." }),
+                OtpResult.UserNotFound => BadRequest(new { message = "Người dùng không tồn tại." }),
+                OtpResult.OtpInvalid => BadRequest(new { message = "Mã OTP không hợp lệ." }),
+                OtpResult.OtpExpired => BadRequest(new { message = "Mã OTP đã hết hạn." }),
+                _ => StatusCode(500, new { message = "Lỗi không xác định." })
+            };
+        }
     }
 }

@@ -146,7 +146,6 @@ namespace API_Project.Services
             if (user == null)
                 return AuthResult.UserNotFound;
             //Kiểm tra OTP có khớp không?
-            //Kiểm tra OTP có khớp không?
             if (!PasswordHasher.VerifyPassword(model.OTP, user.OTP))
                 return AuthResult.OtpInvalid;
             //Kiểm tra token còn hạn không
@@ -158,6 +157,23 @@ namespace API_Project.Services
             _db.SaveChanges();
 
             return AuthResult.Success;
+        }
+        public OtpResult CheckOtp(CheckOtpDTO model)
+        {
+            var user = _db.Users
+                .FirstOrDefault(u => u.Phone == model.Username || u.Email == model.Username);
+
+            if (user == null)
+                return OtpResult.UserNotFound;
+
+            if (!PasswordHasher.VerifyPassword(model.OTP, user.OTP))
+                return OtpResult.OtpInvalid;
+
+            bool isExpired = (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - user.TimeOtp) > (15 * 60 * 1000);
+            if (isExpired)
+                return OtpResult.OtpExpired;
+
+            return OtpResult.Success;
         }
     }
 }

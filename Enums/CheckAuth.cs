@@ -47,5 +47,13 @@
         InvalidPassword,
         AccountExists
     }
+    public enum OtpResult
+    {
+        Success,
+        UserNotFound,
+        OtpInvalid,
+        OtpExpired
+    }
+
 
 }
