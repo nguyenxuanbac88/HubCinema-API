@@ -225,14 +225,16 @@ namespace API_Project.Services
 
             var token = authHeader.Substring("Bearer ".Length).Trim();
 
-            var existingToken = await _db.Users.FirstOrDefaultAsync(t => t.TokenLogin == token);
-            if (existingToken != null)
-            {
-                _db.Users.Remove(existingToken);
-                await _db.SaveChangesAsync();
-            }
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.TokenLogin == token);
+            if (user == null)
+                return new UnauthorizedObjectResult("Token không hợp lệ");
+
+            // Xoá hoặc reset token
+            user.TokenLogin = null;
+            await _db.SaveChangesAsync();
 
             return new OkObjectResult(new { message = "Đăng xuất thành công" });
         }
+
     }
 }
