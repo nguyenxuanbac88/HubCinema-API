@@ -51,7 +51,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddScoped<AuthService>();
-builder.Services.AddSingleton<JwtTokenGenerator>();
+builder.Services.AddScoped<JwtTokenGenerator>();
 builder.Services.AddScoped<PublicService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddTransient<EmailService>();

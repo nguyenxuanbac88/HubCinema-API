@@ -28,8 +28,63 @@ namespace API_Project.Helpers
 
             var claims = new[]
             {
-        new Claim(ClaimTypes.Name, username),
-        new Claim(ClaimTypes.Role, role),
+                new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.Role, role),
+                new Claim(JwtRegisteredClaimNames.Iat,
+                    new DateTimeOffset(issuedAt).ToUnixTimeSeconds().ToString(),
+                    ClaimValueTypes.Integer64)
+            };
+
+            var token = new JwtSecurityToken(
+                issuer: jwtSection["Issuer"],
+                audience: jwtSection["Audience"],
+                claims: claims,
+                notBefore: issuedAt,
+                expires: issuedAt.AddMinutes(expiresInMinutes),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        public IDictionary<string, string> ValidateOtpToken(string token)
+        {
+            var jwtSection = _configuration.GetSection("Jwt");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["Key"]));
+
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+
+                var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = key,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedToken);
+
+                return principal.Claims.ToDictionary(c => c.Type, c => c.Value);
+            }
+            catch
+            {
+                return null; // Token hết hạn hoặc không hợp lệ
+            }
+        }
+        public string GenerateOtpToken(string username, string otp, int expiresInMinutes = 15)
+        {
+            var jwtSection = _configuration.GetSection("Jwt");
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var issuedAt = DateTime.UtcNow;
+
+            var claims = new[]
+            {
+        new Claim(JwtRegisteredClaimNames.Sub, username),
+        new Claim("otp", otp),
+        new Claim("purpose", "reset-password"),
         new Claim(JwtRegisteredClaimNames.Iat,
             new DateTimeOffset(issuedAt).ToUnixTimeSeconds().ToString(),
             ClaimValueTypes.Integer64)
@@ -46,6 +101,7 @@ namespace API_Project.Helpers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
 
     }
 

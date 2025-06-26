@@ -11,13 +11,13 @@ namespace API_Project.Services
     public class AuthService
     {
         private readonly ApplicationDbContext _db;
-        private readonly JwtTokenGenerator _tokenGenerator;
+        private readonly JwtTokenGenerator _jwtTokenGenerator;
         private readonly EmailService _emailService;
 
-        public AuthService(ApplicationDbContext db, JwtTokenGenerator tokenGenerator, EmailService emailService)
+        public AuthService(ApplicationDbContext db, EmailService emailService, JwtTokenGenerator jwtTokenGenerator)
         {
             _db = db;
-            _tokenGenerator = tokenGenerator;
+            _jwtTokenGenerator = jwtTokenGenerator;
             _emailService = emailService;
         }
 
@@ -30,7 +30,7 @@ namespace API_Project.Services
                 return (AuthResult.InvalidCredentials, null);
 
             string roleName = ((UserRole)user.Role).ToString();
-            string token = _tokenGenerator.GenerateToken(user.Phone, roleName);
+            string token = _jwtTokenGenerator.GenerateToken(user.Phone, roleName);
 
             user.TokenLogin = token;
             _db.SaveChanges();
@@ -40,33 +40,27 @@ namespace API_Project.Services
 
         public RegisterResult Register(RegisterDTO model)
         {
-            // Kiểm tra tuổi
             int age = DateTime.Today.Year - model.dob.Year;
             if (model.dob.Date > DateTime.Today.AddYears(-age)) age--;
             if (age < 12)
                 return RegisterResult.Underage;
 
-            // Kiểm tra email
             var emailStatus = CheckAuth.CheckEmail(model.email);
             if (emailStatus != EmailCheckResult.Valid)
                 return RegisterResult.InvalidEmail;
 
-            // Kiểm tra số điện thoại
             var phoneStatus = CheckAuth.CheckPhoneNumber(model.phone);
             if (phoneStatus != PhoneCheckResult.Valid)
                 return RegisterResult.InvalidPhone;
 
-            // Kiểm tra mật khẩu
             var pwStatus = CheckAuth.CheckPassword(model.password);
             if (pwStatus != PasswordCheckResult.Valid)
                 return RegisterResult.InvalidPassword;
 
-            // Kiểm tra tài khoản tồn tại
             var exists = _db.Users.Any(u => u.Email == model.email || u.Phone == model.phone);
             if (exists)
                 return RegisterResult.AccountExists;
 
-            // Mã hoá mật khẩu
             string hashedPassword = PasswordHasher.HashPassword(model.password);
 
             var user = new Models.Entities.User
@@ -86,7 +80,6 @@ namespace API_Project.Services
             _db.Users.Add(user);
             _db.SaveChanges();
 
-            // Sinh mã barcode từ IDUser sau khi lưu
             user.MaBarcode = GenerateUserCode(user.IDUser);
             _db.SaveChanges();
 
@@ -101,77 +94,79 @@ namespace API_Project.Services
             return msCut + idUser.ToString();
         }
 
-        public AuthResult FogotPassword(FogotPasswordDTO model)
+        public (AuthResult result, string otpToken) ForgotPassword(FogotPasswordDTO model)
         {
             var user = _db.Users
                 .FirstOrDefault(u => u.Phone == model.Username || u.Email == model.Username);
 
             if (user == null)
-                return AuthResult.UserNotFound;
+                return (AuthResult.UserNotFound, null);
 
             var ResultsEmail = CheckAuth.CheckEmail(model.Username);
-            if ((int)ResultsEmail!=0)
-                return AuthResult.EmailInvalid;
+            if ((int)ResultsEmail != 0)
+                return (AuthResult.EmailInvalid, null);
 
             var otp = GenerateOTP.GenerateUserOTP();
 
             string subject = "Mã OTP HubCinema";
             string body = $@"
-                <div style='font-family: Arial, sans-serif; line-height: 1.6;'>
-                    <h2>HubCinema - Xác nhận tài khoản</h2>
-                    <p>Xin chào <b>{user.FullName}</b>,</p>
-                    <p>Bạn (hoặc ai đó) đã yêu cầu đặt lại mật khẩu cho tài khoản HubCinema của bạn.</p>
-                    <p>Mã OTP của bạn là:</p>
-                    <h3 style='color: #e91e63;'>{otp}</h3>
-                    <p>Mã này có hiệu lực trong vòng <b>15 phút</b>.</p>
-                    <p>Nếu bạn không yêu cầu điều này, hãy bỏ qua email này.</p>
-                    <br/>
-                    <p>Trân trọng,<br/>HubCinema</p>
-                </div>";
+        <div style='font-family: Arial, sans-serif; line-height: 1.6;'>
+            <h2>HubCinema - Xác nhận tài khoản</h2>
+            <p>Xin chào <b>{user.FullName}</b>,</p>
+            <p>Bạn (hoặc ai đó) đã yêu cầu đặt lại mật khẩu cho tài khoản HubCinema của bạn.</p>
+            <p>Mã OTP của bạn là:</p>
+            <h3 style='color: #e91e63;'>{otp}</h3>
+            <p>Mã này có hiệu lực trong vòng <b>15 phút</b>.</p>
+            <p>Nếu bạn không yêu cầu điều này, hãy bỏ qua email này.</p>
+            <br/>
+            <p>Trân trọng,<br/>HubCinema</p>
+        </div>";
 
             _emailService.SendEmail(model.Username, subject, body);
 
-            user.OTP = PasswordHasher.HashPassword(otp);
-            user.TimeOtp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            _db.SaveChanges();
-
-            return AuthResult.Success;
+            var otpToken = _jwtTokenGenerator.GenerateOtpToken(model.Username, otp);
+            return (AuthResult.Success, otpToken);
         }
 
         public AuthResult ConfirmPW(ConfirmPwDTO model)
         {
+            var payload = _jwtTokenGenerator.ValidateOtpToken(model.OtpToken);
+
+            if (payload == null)
+                return AuthResult.OtpExpired;
+
+            if (!payload.TryGetValue("otp", out string otpFromToken) ||
+                !payload.TryGetValue("sub", out string usernameInToken))
+                return AuthResult.OtpInvalid;
+
+            if (otpFromToken != model.OTP || usernameInToken != model.Username)
+                return AuthResult.OtpInvalid;
+
             var user = _db.Users
                 .FirstOrDefault(u => u.Phone == model.Username || u.Email == model.Username);
 
             if (user == null)
                 return AuthResult.UserNotFound;
-            //Kiểm tra OTP có khớp không?
-            if (!PasswordHasher.VerifyPassword(model.OTP, user.OTP))
-                return AuthResult.OtpInvalid;
-            //Kiểm tra token còn hạn không
-            bool isExpired = (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - user.TimeOtp) > (15 * 60 * 1000);
-            if (isExpired)
-                return AuthResult.OtpExpired;
 
             user.Password = PasswordHasher.HashPassword(model.NewPW);
             _db.SaveChanges();
 
             return AuthResult.Success;
         }
+
         public OtpResult CheckOtp(CheckOtpDTO model)
         {
-            var user = _db.Users
-                .FirstOrDefault(u => u.Phone == model.Username || u.Email == model.Username);
+            var payload = _jwtTokenGenerator.ValidateOtpToken(model.OtpToken);
 
-            if (user == null)
-                return OtpResult.UserNotFound;
+            if (payload == null)
+                return OtpResult.OtpExpired;
 
-            if (!PasswordHasher.VerifyPassword(model.OTP, user.OTP))
+            if (!payload.TryGetValue("otp", out string otpFromToken) ||
+                !payload.TryGetValue("sub", out string usernameInToken))
                 return OtpResult.OtpInvalid;
 
-            bool isExpired = (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - user.TimeOtp) > (15 * 60 * 1000);
-            if (isExpired)
-                return OtpResult.OtpExpired;
+            if (otpFromToken != model.OTP || usernameInToken != model.Username)
+                return OtpResult.OtpInvalid;
 
             return OtpResult.Success;
         }
