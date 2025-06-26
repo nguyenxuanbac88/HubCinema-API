@@ -8,6 +8,7 @@
 
     public class ChangeEmailConfirmDTO
     {
+        public string OtpToken { get; set; }
         public string Otp { get; set; }
     }
 

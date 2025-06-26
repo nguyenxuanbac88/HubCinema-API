@@ -1,13 +1,16 @@
 ﻿
 using System.Net;
 using System.Net.Mail;
+using API_Project.Helpers;
 using API_Project.Models;
 using Microsoft.Extensions.Options;
 
 
 public class EmailService
 {
+    
     private readonly EmailSettings _emailSettings;
+
     public EmailService() { }
     public EmailService(IOptions<EmailSettings> emailSettings)
     {

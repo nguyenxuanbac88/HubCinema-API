@@ -72,7 +72,7 @@ namespace API_Project.Helpers
                 return null; // Token hết hạn hoặc không hợp lệ
             }
         }
-        public string GenerateOtpToken(string username, string otp, int expiresInMinutes = 15)
+        public string GenerateOtpToken(string username, string otp,string purpose = "reset-password",int expiresInMinutes = 15,IDictionary<string, string> additionalClaims = null)
         {
             var jwtSection = _configuration.GetSection("Jwt");
 
@@ -81,15 +81,23 @@ namespace API_Project.Helpers
 
             var issuedAt = DateTime.UtcNow;
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
-        new Claim(JwtRegisteredClaimNames.Sub, username),
-        new Claim("otp", otp),
-        new Claim("purpose", "reset-password"),
-        new Claim(JwtRegisteredClaimNames.Iat,
-            new DateTimeOffset(issuedAt).ToUnixTimeSeconds().ToString(),
-            ClaimValueTypes.Integer64)
-    };
+                new Claim(JwtRegisteredClaimNames.Sub, username),
+                new Claim("otp", otp),
+                new Claim("purpose", purpose),
+                new Claim(JwtRegisteredClaimNames.Iat,
+                    new DateTimeOffset(issuedAt).ToUnixTimeSeconds().ToString(),
+                    ClaimValueTypes.Integer64)
+            };
+
+            if (additionalClaims != null)
+            {
+                foreach (var pair in additionalClaims)
+                {
+                    claims.Add(new Claim(pair.Key, pair.Value));
+                }
+            }
 
             var token = new JwtSecurityToken(
                 issuer: jwtSection["Issuer"],
@@ -102,7 +110,6 @@ namespace API_Project.Helpers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
 
     }
 
