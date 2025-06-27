@@ -47,5 +47,7 @@ namespace API_Project.Models.Entities
 
         [Column("DienVien")]
         public string Actors { get; set; }
+        public ICollection<Showtime> Showtimes { get; set; }
+
     }
 }

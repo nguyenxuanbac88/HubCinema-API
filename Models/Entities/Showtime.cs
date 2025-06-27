@@ -31,5 +31,11 @@ namespace API_Project.Models.Entities
 
         [Column("MaRap")]
         public int MaRap { get; set; }
+
+        [ForeignKey("MaPhim")]
+        public Movie Movie { get; set; }
+
+        [ForeignKey("MaRap")]
+        public Cinema Cinema { get; set; }
     }
 }

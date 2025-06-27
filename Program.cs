@@ -56,6 +56,8 @@ builder.Services.AddScoped<PublicService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddTransient<EmailService>();
 builder.Services.AddScoped<PrivateService>();
+builder.Services.AddScoped<IScheduleService, ScheduleService>();
+
 
 
 builder.Services.Configure<EmailSettings>(

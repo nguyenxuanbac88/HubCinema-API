@@ -1,0 +1,92 @@
+﻿using API_Project.Enums;
+using API_Project.Models;
+using API_Project.Data;
+using Microsoft.EntityFrameworkCore;
+using API_Project.Models.DTOs;
+
+namespace API_Project.Services
+{
+    public class ScheduleService : IScheduleService
+    {
+        private readonly ApplicationDbContext _db;
+
+        public ScheduleService(ApplicationDbContext db)
+        {
+            _db = db;
+        }
+
+        public async Task<ApiResponse<FilterDataDto>> GetFilterDataAsync()
+        {
+            var regions = await _db.Cinemas
+                .Select(r => r.City)
+                .Distinct()
+                .OrderBy(r => r)
+                .ToListAsync();
+
+            regions.Insert(0, "Toàn quốc");
+
+            var cinemas = await _db.Cinemas
+                .Select(r => new CinemaDto
+                {
+                    MaRap = r.IDCinema,
+                    TenRap = r.CinemaName,
+                    Region = r.City
+                }).ToListAsync();
+
+            return ApiResponse<FilterDataDto>.Ok(new FilterDataDto
+            {
+                Regions = regions,
+                Cinemas = cinemas
+            });
+        }
+
+        public async Task<ApiResponse<List<DateTime>>> GetAvailableDatesAsync(int maPhim)
+        {
+            var exists = await _db.Movies.AnyAsync(p => p.IDMovie == maPhim);
+            if (!exists)
+                return ApiResponse<List<DateTime>>.Fail(ScheduleErrorCode.MovieNotFound, "Phim không tồn tại.");
+
+            var dates = await _db.Showtimes
+                .Where(s => s.MaPhim == maPhim)
+                .Select(s => s.NgayChieu)
+                .Distinct()
+                .OrderBy(d => d)
+                .ToListAsync();
+
+            if (!dates.Any())
+                return ApiResponse<List<DateTime>>.Fail(ScheduleErrorCode.NoShowtimes, "Không có suất chiếu.");
+
+            return ApiResponse<List<DateTime>>.Ok(dates);
+        }
+
+        public async Task<ApiResponse<List<GroupedShowtimeDTO>>> GetShowtimesAsync(int maPhim, DateTime date, string region = null, int? maRap = null)
+        {
+            if (!await _db.Movies.AnyAsync(p => p.IDMovie == maPhim))
+                return ApiResponse<List<GroupedShowtimeDTO>>.Fail(ScheduleErrorCode.MovieNotFound, "Phim không tồn tại.");
+
+            var query = _db.Showtimes
+                .Include(s => s.Cinema)
+                .Where(s => s.MaPhim == maPhim && s.NgayChieu == date);
+
+            if (!string.IsNullOrEmpty(region) && region != "Toàn quốc")
+                query = query.Where(s => s.Cinema.City == region);
+
+            if (maRap.HasValue && maRap.Value != 0)
+                query = query.Where(s => s.MaRap == maRap.Value);
+
+            var result = await query
+                .GroupBy(s => new { s.MaRap, s.Cinema.CinemaName })
+                .Select(g => new GroupedShowtimeDTO
+                {
+                    MaRap = g.Key.MaRap,
+                    TenRap = g.Key.CinemaName,
+                    GioChieu = g.Select(x => x.GioChieu.ToString(@"hh\:mm")).ToList()
+                }).ToListAsync();
+
+            if (!result.Any())
+                return ApiResponse<List<GroupedShowtimeDTO>>.Fail(ScheduleErrorCode.NoShowtimes, "Không tìm thấy suất chiếu phù hợp.");
+
+            return ApiResponse<List<GroupedShowtimeDTO>>.Ok(result);
+        }
+    }
+}

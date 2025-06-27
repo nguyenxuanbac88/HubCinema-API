@@ -24,6 +24,8 @@ namespace API_Project.Models.Entities
         public string City { get; set; }
 
         public ICollection<Room> Rooms { get; set; }
+        public ICollection<Showtime> Showtimes { get; set; }
+
 
     }
 }

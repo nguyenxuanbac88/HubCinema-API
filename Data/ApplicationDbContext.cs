@@ -16,5 +16,6 @@ namespace API_Project.Data
         public DbSet<Food> Foods { get; set; }
         public DbSet<Cinema> Cinemas { get; set; }
         public DbSet<Room> Rooms { get; set; }
+        public DbSet<Showtime> Showtimes { get; set; }
     }
 }

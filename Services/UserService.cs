@@ -49,7 +49,6 @@ namespace API_Project.Services
             );
         }
 
-        // ✅ Sửa lại: Lấy token từ Header "Authorization: Bearer ..."
         public async Task<IActionResult> HandleGetUserInfoAsync(HttpContext httpContext)
         {
             var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();

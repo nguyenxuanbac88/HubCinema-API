@@ -2,9 +2,6 @@
 using API_Project.Enums;
 using API_Project.Helpers;
 using API_Project.Models.DTOs;
-using API_Project.Models.Entities;
-using System;
-using System.Linq;
 
 namespace API_Project.Services
 {
