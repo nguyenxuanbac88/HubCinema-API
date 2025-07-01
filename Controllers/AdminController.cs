@@ -8,11 +8,9 @@ namespace API_Project.Controllers
     [Route("api/Admin")]
     public class AdminController : Controller
     {
-        private readonly PublicService _publicService;
         private readonly PrivateService _privateService;
         public AdminController(PublicService publicService, PrivateService privateService)
         {
-            _publicService = publicService;
             _privateService = privateService;
         }
         [HttpPut("UpdateMovie/{id}")]
@@ -24,7 +22,7 @@ namespace API_Project.Controllers
             }
             try
             {
-                var result = await _publicService.UpdateMovieAsync(id, movieDTO);
+                var result = await _privateService.UpdateMovieAsync(id, movieDTO);
                 if (result)
                 {
                     return Ok(new { message = "Movie updated successfully" });
@@ -53,7 +51,7 @@ namespace API_Project.Controllers
             }
             try
             {
-                var result = await _publicService.UpdateCinema(id, cinemaDTO);
+                var result = await _privateService.UpdateCinema(id, cinemaDTO);
                 if (result)
                 {
                     return Ok(new { message = "Cinema updated successfully" });
@@ -82,7 +80,7 @@ namespace API_Project.Controllers
             }
             try
             {
-                var result = await _publicService.CreateMovie(movieDTO);
+                var result = await _privateService.CreateMovie(movieDTO);
                 if (result)
                 {
                     return Ok(new { message = "Movie created successfully" });
@@ -111,7 +109,7 @@ namespace API_Project.Controllers
             }
             try
             {
-                var result = await _publicService.CreateCinema(cinemaDTO);
+                var result = await _privateService.CreateCinema(cinemaDTO);
                 if (result)
                 {
                     return Ok(new { message = "Movie created successfully" });
