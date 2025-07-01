@@ -129,6 +129,35 @@ namespace API_Project.Controllers
                 });
             }
         }
+        [HttpPost("CreateFood")]
+        public async Task<IActionResult> CreateFood([FromBody] FoodDTO foodDTO)
+        {
+            if (foodDTO == null)
+            {
+                return BadRequest("Movie data is null");
+            }
+            try
+            {
+                var result = await _privateService.CreateFood(foodDTO);
+                if (result)
+                {
+                    return Ok(new { message = "Food created successfully" });
+                }
+                else
+                {
+                    return StatusCode(500, "Failed to create food");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Internal server error",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
         [HttpGet("GetRoomsByCinemaName/{nameCinema}")]
         public async Task<IActionResult> GetRoomsByCinemaName(string nameCinema)
         {

@@ -119,5 +119,27 @@ namespace API_Project.Services
             return room;
         }
 
+        //Food
+        public async Task<bool> CreateFood(FoodDTO foodDTO)
+        {
+            try
+            {
+                var food = new Food
+                {
+                    FoodName = foodDTO.FoodName,
+                    Price = foodDTO.Price,
+                    Description = foodDTO.Description,
+                    ImageURL = foodDTO.ImageURL,
+                    CinemaID = foodDTO.IDCinema
+                };
+                _context.Foods.Add(food);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
