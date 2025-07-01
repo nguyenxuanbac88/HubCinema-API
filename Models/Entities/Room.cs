@@ -26,8 +26,5 @@ namespace API_Project.Models.Entities
 
         [Column("status")]
         public bool Status { get; set; }
-
-        [ForeignKey("CinemaID")]
-        public Cinema Cinema { get; set; }
     }
 }

@@ -118,6 +118,28 @@ namespace API_Project.Services
                 .ToListAsync();
             return room;
         }
+        public async Task<bool> CreateRoom(RoomDTO roomDTO)
+        {
+            try
+            {
+                var room = new Room
+                {
+                    IDRoom = roomDTO.IDRoom,
+                    CinemaID = roomDTO.CinemaID,
+                    RoomName = roomDTO.RoomName,
+                    RoomType = roomDTO.RoomType,
+                    RoomImageURL = roomDTO.RoomImageURL,
+                    Status = roomDTO.Status
+                };
+                _context.Rooms.Add(room);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         //Food
         public async Task<bool> CreateFood(FoodDTO foodDTO)

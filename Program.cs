@@ -1,9 +1,13 @@
-﻿using API_Project.Data;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using API_Project.Data;
 using API_Project.Helpers;
 using API_Project.Models;
 using API_Project.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +53,26 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
+            ),
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            RoleClaimType = ClaimTypes.Role
+        };
+    });
+
+
+
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<JwtTokenGenerator>();

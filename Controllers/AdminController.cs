@@ -129,6 +129,35 @@ namespace API_Project.Controllers
                 });
             }
         }
+        [HttpPost("CreateRoom")]
+        public async Task<IActionResult> CreateRoom([FromBody] RoomDTO roomDTO)
+        {
+            if (roomDTO == null)
+            {
+                return BadRequest("Room data is null");
+            }
+            try
+            {
+                var result = await _privateService.CreateRoom(roomDTO);
+                if (result)
+                {
+                    return Ok(new { message = "Room created successfully" });
+                }
+                else
+                {
+                    return StatusCode(500, "Failed to create Room");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Internal server error",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
         [HttpPost("CreateFood")]
         public async Task<IActionResult> CreateFood([FromBody] FoodDTO foodDTO)
         {
