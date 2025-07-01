@@ -65,5 +65,11 @@ namespace API_Project.Controllers
             };
         }
 
+        [HttpGet("Logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var result = await _profileService.HandleLogoutAsync(HttpContext);
+            return result;
+        }
     }
 }
