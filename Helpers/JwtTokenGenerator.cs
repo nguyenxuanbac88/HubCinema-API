@@ -110,7 +110,16 @@ namespace API_Project.Helpers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        public string GetUsernameFromToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
 
+            var username = jwtToken.Claims.FirstOrDefault(c =>
+                c.Type == System.Security.Claims.ClaimTypes.Name || c.Type == "unique_name")?.Value;
+
+            return username;
+        }
     }
 
 }

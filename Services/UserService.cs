@@ -26,20 +26,11 @@ namespace API_Project.Services
 
         }
 
-        public string GetUsernameFromToken(string token)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var jwtToken = handler.ReadJwtToken(token);
 
-            var username = jwtToken.Claims.FirstOrDefault(c =>
-                c.Type == System.Security.Claims.ClaimTypes.Name || c.Type == "unique_name")?.Value;
-
-            return username;
-        }
 
         public async Task<Models.Entities.User> GetUserFromTokenAsync(string token)
         {
-            var username = GetUsernameFromToken(token);
+            var username = _jwtTokenGenerator.GetUsernameFromToken(token);
             if (string.IsNullOrEmpty(username))
                 return null;
 
