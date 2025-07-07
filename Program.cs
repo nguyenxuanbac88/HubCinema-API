@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,12 @@ builder.Services.AddControllersWithViews(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var config = builder.Configuration.GetValue<string>("Redis:ConnectionString");
+    return ConnectionMultiplexer.Connect(config);
+});
 
 
 builder.Services.AddSwaggerGen(c =>
