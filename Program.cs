@@ -30,6 +30,16 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     return ConnectionMultiplexer.Connect(config);
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -105,7 +115,7 @@ if (app.Environment.IsDevelopment())
 // Cấu hình Swagger ngoài môi trường dev 
 app.UseSwagger();
 app.UseSwaggerUI();
-
+app.UseCors("AllowAll");
 app.UseAuthorization();
 
 app.MapControllers();

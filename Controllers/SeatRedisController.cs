@@ -5,11 +5,11 @@ namespace API_Project.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class SeatController : ControllerBase
+    public class SeatRedisController : ControllerBase
     {
         private readonly RedisService _redisService;
 
-        public SeatController(RedisService redisService)
+        public SeatRedisController(RedisService redisService)
         {
             _redisService = redisService;
         }
