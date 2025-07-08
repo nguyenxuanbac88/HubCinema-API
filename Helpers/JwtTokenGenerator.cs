@@ -120,6 +120,37 @@ namespace API_Project.Helpers
 
             return username;
         }
+        public bool TryGetUsernameFromToken(string token, out string username)
+        {
+            username = null;
+            var jwtSection = _configuration.GetSection("Jwt");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["Key"]));
+
+            try
+            {
+                JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+                var tokenHandler = new JwtSecurityTokenHandler();
+
+                var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = key,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedToken);
+
+                username = principal.Claims.FirstOrDefault(c =>
+                    c.Type == ClaimTypes.Name || c.Type == "unique_name")?.Value;
+
+                return !string.IsNullOrEmpty(username);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
     }
 
 }

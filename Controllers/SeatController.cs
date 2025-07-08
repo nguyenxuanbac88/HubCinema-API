@@ -1,17 +1,20 @@
 ﻿using API_Project.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API_Project.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class SeatRedisController : ControllerBase
+    public class SeatController : ControllerBase
     {
         private readonly RedisService _redisService;
-
-        public SeatRedisController(RedisService redisService)
+        private readonly SeatLayoutService _seatLayoutService;
+        public SeatController(RedisService redisService, SeatLayoutService seatLayoutService)
         {
             _redisService = redisService;
+            _seatLayoutService = seatLayoutService;
         }
 
         // POST: api/Seat/hold
@@ -44,6 +47,13 @@ namespace API_Project.Controllers
         {
             var list = await _redisService.GetHeldSeatsAsync(showtimeId);
             return Ok(list);
+        }
+
+        [HttpGet("get-layout-price/{idLayout}/{idSuatChieu}")]
+        public async Task<IActionResult> GetLayoutWithPrices(string idLayout, int idSuatChieu)
+        {
+            var result = await _seatLayoutService.GetFullSeatLayoutWithPricesAsync(idLayout, idSuatChieu);
+            return Ok(result);
         }
     }
 }
