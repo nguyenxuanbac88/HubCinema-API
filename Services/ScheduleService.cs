@@ -88,5 +88,21 @@ namespace API_Project.Services
 
             return ApiResponse<List<GroupedShowtimeDTO>>.Ok(result);
         }
+        public async Task<ApiResponse<List<int>>> GetMovieIdsByCinemaAsync(int maRap)
+        {
+            var movieIds = await _db.Showtimes
+                .Where(s => s.MaRap == maRap)
+                .Select(s => s.MaPhim)
+                .Distinct()
+                .ToListAsync();
+
+            if (movieIds == null || !movieIds.Any())
+            {
+                return ApiResponse<List<int>>.Fail(ScheduleErrorCode.NoShowtimes, "Không có suất chiếu.");
+            }
+
+            return ApiResponse<List<int>>.Ok(movieIds);
+        }
+
     }
 }

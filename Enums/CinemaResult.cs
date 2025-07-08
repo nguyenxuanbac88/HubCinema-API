@@ -11,4 +11,5 @@
         InvalidDate = 3,
         InvalidCinema = 4
     }
+
 }

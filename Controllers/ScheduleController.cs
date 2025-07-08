@@ -34,5 +34,14 @@ namespace API_Project.Controllers
             var result = await _scheduleService.GetShowtimesAsync(maPhim, date, region, maRap);
             return Ok(result);
         }
+
+        [HttpGet("GetMovieIdsByCinema")]
+        public async Task<IActionResult> GetMovieIdsByCinema([FromQuery] int maRap)
+        {
+            var result = await _scheduleService.GetMovieIdsByCinemaAsync(maRap);
+            if (result.Success)
+                return Ok(result);
+            return BadRequest(result);
+        }
     }
 }

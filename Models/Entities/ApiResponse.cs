@@ -21,6 +21,7 @@ namespace API_Project.Models
             };
         }
 
+
         // Phản hồi thất bại
         public static ApiResponse<T> Fail(ScheduleErrorCode errorCode, string message)
         {
