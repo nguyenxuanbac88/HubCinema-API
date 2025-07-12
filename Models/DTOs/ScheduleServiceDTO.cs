@@ -15,6 +15,6 @@
     {
         public int MaRap { get; set; }          // ID rạp
         public string TenRap { get; set; }      // Tên rạp
-        public List<string> GioChieu { get; set; }  // Các giờ chiếu theo format "HH:mm"
+        public List<ShowtimeItemDTO> GioChieu { get; set; }
     }
 }

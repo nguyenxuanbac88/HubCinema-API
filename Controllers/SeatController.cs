@@ -49,10 +49,10 @@ namespace API_Project.Controllers
             return Ok(list);
         }
 
-        [HttpGet("get-layout-price/{idLayout}/{idSuatChieu}")]
-        public async Task<IActionResult> GetLayoutWithPrices(string idLayout, int idSuatChieu)
+        [HttpGet("get-layout-price/{idSuatChieu}")]
+        public async Task<IActionResult> GetLayoutWithPrices(int idSuatChieu)
         {
-            var result = await _seatLayoutService.GetFullSeatLayoutWithPricesAsync(idLayout, idSuatChieu);
+            var result = await _seatLayoutService.GetFullSeatLayoutWithPricesAsync(idSuatChieu);
             return Ok(result);
         }
     }

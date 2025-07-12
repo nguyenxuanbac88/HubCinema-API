@@ -41,5 +41,6 @@ namespace API_Project.Models.Entities
 
         [ForeignKey("MaRap")]
         public Cinema Cinema { get; set; }
+
     }
 }

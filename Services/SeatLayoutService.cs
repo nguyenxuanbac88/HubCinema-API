@@ -18,14 +18,12 @@ namespace API_Project.Services
             _redis = redis.GetDatabase();
         }
 
-        public async Task<object> GetFullSeatLayoutWithPricesAsync(string idLayout, int idSuatChieu)
+        public async Task<object> GetFullSeatLayoutWithPricesAsync(int idSuatChieu)
         {
             if (_env.WebRootPath == null)
                 throw new InvalidOperationException("WebRootPath is not set.");
-            if (string.IsNullOrEmpty(idLayout))
-                throw new ArgumentException("idLayout cannot be null or empty", nameof(idLayout));
 
-            // 1. Truy xuất suất chiếu để lấy MaRap, MaPhong, Type
+            // 1. Lấy suất chiếu
             var suatChieu = await _dbContext.Showtimes
                 .FirstOrDefaultAsync(s => s.MaSuatChieu == idSuatChieu);
 
@@ -36,26 +34,37 @@ namespace API_Project.Services
             int maPhong = suatChieu.PhongChieu;
             int typeSuatChieu = suatChieu.TypeSuatChieu;
 
-            // 2. Đọc layout từ file
-            string layoutPath = Path.Combine(_env.WebRootPath, "data", "seat-layout", $"{maRap}_{idLayout}.json");
+            // 2. Lấy layout ID từ phòng
+            var phong = await _dbContext.Rooms
+                .FirstOrDefaultAsync(p => p.IDRoom == maPhong);
+
+            if (phong == null)
+                throw new Exception($"Không tìm thấy phòng chiếu với id = {maPhong}");
+
+            if (string.IsNullOrEmpty(phong.id_layout))
+                throw new Exception($"Phòng chiếu id = {maPhong} chưa có layout.");
+
+            // 3. Đọc file layout JSON
+            string layoutPath = Path.Combine(_env.WebRootPath, "data", "seat-layout", $"{phong.id_layout}.json");
+
             if (!File.Exists(layoutPath))
                 throw new FileNotFoundException($"Layout file not found: {layoutPath}");
 
             string layoutJson = await File.ReadAllTextAsync(layoutPath);
             var layoutData = JsonSerializer.Deserialize<SeatLayoutWrapper>(layoutJson);
 
-            // 3. Ghế đã thanh toán
+            // 4. Ghế đã thanh toán
             var confirmedSeats = await _dbContext.BookedSeats
                 .Where(s => s.IdShowtime == idSuatChieu && s.status == "Đã thanh toán")
                 .Select(s => s.IdSeat)
                 .ToListAsync();
 
-            // 4. Ghế đang giữ
+            // 5. Ghế đang giữ (từ Redis)
             string redisKey = $"suatchieu:{idSuatChieu}:held_seats";
             var heldSeats = await _redis.SetMembersAsync(redisKey);
             var heldList = heldSeats.Select(v => v.ToString()).ToList();
 
-            // 5. Lấy giá suất chiếu
+            // 6. Giá suất chiếu
             var loaiSuat = await _dbContext.ShowtimeTypes
                 .FirstOrDefaultAsync(x => x.Id == typeSuatChieu);
 
@@ -64,16 +73,17 @@ namespace API_Project.Services
 
             long giaSuatChieu = loaiSuat.Price;
 
+            // 7. Giá ghế theo dãy
             var seatPrices = await _dbContext.SeatTypesInRooms
                 .Where(x => x.RoomId == maPhong && x.CinemaId == maRap)
                 .ToListAsync();
 
-            // 7. Tính giá mỗi dãy = giá ghế + giá suất chiếu
             var priceByRow = seatPrices.ToDictionary(
-                x => x.RowCode, 
+                x => x.RowCode,
                 x => x.Price + giaSuatChieu
             );
 
+            // 8. Trả về
             return new
             {
                 layout = layoutData.layout,
@@ -82,6 +92,7 @@ namespace API_Project.Services
                 prices = priceByRow
             };
         }
+
 
 
 

@@ -74,20 +74,29 @@ namespace API_Project.Services
             if (maRap.HasValue && maRap.Value != 0)
                 query = query.Where(s => s.MaRap == maRap.Value);
 
-            var result = await query
-                .GroupBy(s => new { s.MaRap, s.Cinema.CinemaName })
+            // Bước quan trọng: lấy toàn bộ ra memory để xử lý phức tạp
+            var showtimeList = await query.ToListAsync();
+
+            var groupedResult = showtimeList
+                .GroupBy(s => new { s.MaRap, TenRap = s.Cinema?.CinemaName ?? "Không rõ" }) // fallback nếu Cinema null
                 .Select(g => new GroupedShowtimeDTO
                 {
                     MaRap = g.Key.MaRap,
-                    TenRap = g.Key.CinemaName,
-                    GioChieu = g.Select(x => x.GioChieu.ToString(@"hh\:mm")).ToList()
-                }).ToListAsync();
+                    TenRap = g.Key.TenRap,
+                    GioChieu = g.Select(x => new ShowtimeItemDTO
+                    {
+                        GioChieu = x.GioChieu.ToString(@"hh\:mm"),
+                        PhongChieu = x.PhongChieu
+                    }).ToList()
+                }).ToList();
 
-            if (!result.Any())
+            if (!groupedResult.Any())
                 return ApiResponse<List<GroupedShowtimeDTO>>.Fail(ScheduleErrorCode.NoShowtimes, "Không tìm thấy suất chiếu phù hợp.");
 
-            return ApiResponse<List<GroupedShowtimeDTO>>.Ok(result);
+            return ApiResponse<List<GroupedShowtimeDTO>>.Ok(groupedResult);
         }
+
+
         public async Task<ApiResponse<List<int>>> GetMovieIdsByCinemaAsync(int maRap)
         {
             var movieIds = await _db.Showtimes
