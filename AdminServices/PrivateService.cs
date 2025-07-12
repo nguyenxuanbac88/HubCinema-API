@@ -3,7 +3,7 @@ using API_Project.Models.DTOs;
 using API_Project.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace API_Project.Services
+namespace API_Project.AdminServices
 {
     public class PrivateService
     {

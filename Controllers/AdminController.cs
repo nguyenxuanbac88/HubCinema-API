@@ -1,5 +1,5 @@
-﻿using API_Project.Models.DTOs;
-using API_Project.Services;
+﻿using API_Project.AdminServices;
+using API_Project.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API_Project.Controllers
