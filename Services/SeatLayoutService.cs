@@ -77,11 +77,16 @@ namespace API_Project.Services
             var seatPrices = await _dbContext.SeatTypesInRooms
                 .Where(x => x.RoomId == maPhong && x.CinemaId == maRap)
                 .ToListAsync();
-
             var priceByRow = seatPrices.ToDictionary(
                 x => x.RowCode,
-                x => x.Price + giaSuatChieu
+                x => new
+                {
+                    SeatType = x.SeatType, // KHÔNG .Name nữa
+                    Price = x.Price + giaSuatChieu
+                }
             );
+
+
 
             // 8. Trả về
             return new
