@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using StackExchange.Redis;
 using API_Project.AdminServices;
+using API_Project.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,7 +92,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 
 
-
+builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<JwtTokenGenerator>();
 builder.Services.AddScoped<PublicService>();

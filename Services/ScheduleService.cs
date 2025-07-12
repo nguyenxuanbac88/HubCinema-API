@@ -86,7 +86,7 @@ namespace API_Project.Services
                     GioChieu = g.Select(x => new ShowtimeItemDTO
                     {
                         GioChieu = x.GioChieu.ToString(@"hh\:mm"),
-                        PhongChieu = x.PhongChieu
+                        SuatChieu = x.MaSuatChieu
                     }).ToList()
                 }).ToList();
 

@@ -3,6 +3,6 @@
     public class ShowtimeItemDTO
     {
         public string GioChieu { get; set; }    // "10:00"
-        public int PhongChieu { get; set; }     // 1, 2, 3...
+        public int SuatChieu { get; set; }     // 1, 2, 3...
     }
 }

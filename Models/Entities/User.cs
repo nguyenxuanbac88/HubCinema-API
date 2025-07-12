@@ -68,6 +68,8 @@ namespace API_Project.Models.Entities
         public long? TimeOtp { get; set; }
         [Column("EmailPending")]
         public string? EmailPending { get; set; }
+        [Column("CreateAt")]
+        public DateTime? CreateAt { get; set; }
 
     }
 }

@@ -1,9 +1,11 @@
 ﻿using API_Project.AdminServices;
 using API_Project.Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API_Project.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/Admin")]
     public class AdminController : Controller

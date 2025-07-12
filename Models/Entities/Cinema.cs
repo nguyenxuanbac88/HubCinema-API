@@ -22,6 +22,9 @@ namespace API_Project.Models.Entities
         [Column("ThanhPho")]
         [MaxLength(255)]
         public string City { get; set; }
+        [Column("TrangThai")]
+        public int IsActive { get; set; }
+
 
         public ICollection<Room> Rooms { get; set; }
         public ICollection<Showtime> Showtimes { get; set; }
