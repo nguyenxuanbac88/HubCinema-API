@@ -8,7 +8,7 @@ namespace API_Project.Models.Entities
     {
         [Key]
         [Column("MaDoAn")]
-        public int IDFood { get; set; }
+        public int? IDFood { get; set; }
 
         [Column("TenDoAn")]
         public string FoodName { get; set; }
