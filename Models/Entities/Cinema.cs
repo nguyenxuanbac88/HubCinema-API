@@ -28,6 +28,7 @@ namespace API_Project.Models.Entities
 
         public ICollection<Room> Rooms { get; set; }
         public ICollection<Showtime> Showtimes { get; set; }
+        public virtual ICollection<Combo_Cinema> ComboCinemas { get; set; }
 
 
     }

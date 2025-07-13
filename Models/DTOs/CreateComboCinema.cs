@@ -1,0 +1,8 @@
+﻿namespace API_Project.Models.DTOs
+{
+    public class CreateComboCinema
+    {
+        public int IdFood { get; set; }
+        public List<int> IdCinemapList { get; set; }
+    }
+}

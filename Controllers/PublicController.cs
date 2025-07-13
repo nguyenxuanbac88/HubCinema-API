@@ -140,7 +140,27 @@ namespace API_Project.Controllers
                 });
             }
         }
+        [HttpGet("GetCombosByCinema/{cinemaId}")]
+        public IActionResult GetCombosByCinema(int cinemaId)
+        {
+            try
+            {
+                var foods = _publicService.GetCombosByCinema(cinemaId);
+                if (foods == null || !foods.Any())
+                    return NotFound($"Không tìm thấy món ăn nào cho rạp có ID = {cinemaId}");
 
+                return Ok(foods);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Internal server error",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
 
         //Room
         [HttpGet("GetRooms")]

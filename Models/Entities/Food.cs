@@ -24,5 +24,7 @@ namespace API_Project.Models.Entities
 
         [Column("MaRap")]
         public int CinemaID { get; set; }
+        public virtual ICollection<Combo_Cinema> ComboCinemas { get; set; }
+
     }
 }

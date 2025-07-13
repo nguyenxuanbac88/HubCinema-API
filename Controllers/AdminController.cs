@@ -189,6 +189,35 @@ namespace API_Project.Controllers
                 });
             }
         }
+        [HttpPost("CreateComboForCinemas")]
+        public async Task<IActionResult> CreateComboForCinemas([FromBody] CreateComboCinema CreateComboCinema)
+        {
+            if (CreateComboCinema == null)
+            {
+                return BadRequest("Movie data is null");
+            }
+            try
+            {
+                var result = await _privateService.CreateComboForCinemasAsync(CreateComboCinema);
+                if (result)
+                {
+                    return Ok(new { message = "Movie created successfully" });
+                }
+                else
+                {
+                    return StatusCode(500, "Failed to create movie");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Internal server error",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
         [HttpGet("GetRoomsByCinemaName/{nameCinema}")]
         public async Task<IActionResult> GetRoomsByCinemaName(string nameCinema)
         {

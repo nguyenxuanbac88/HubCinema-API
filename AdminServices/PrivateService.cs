@@ -163,5 +163,34 @@ namespace API_Project.AdminServices
                 return false;
             }
         }
+        public async Task<bool> CreateComboForCinemasAsync(CreateComboCinema dto)
+        {
+            try
+            {
+                foreach (var maRap in dto.IdCinemapList)
+                {
+                    var exists = await _context.Combo_Cinema
+                        .AnyAsync(c => c.MaDoAn == dto.IdFood && c.MaRap == maRap);
+
+                    if (!exists)
+                    {
+                        var combo = new Combo_Cinema
+                        {
+                            MaDoAn = dto.IdFood,
+                            MaRap = maRap
+                        };
+
+                        _context.Combo_Cinema.Add(combo);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

@@ -155,4 +155,12 @@ public class PublicService
              }).FirstOrDefaultAsync();
         return room;
     }
+    public List<Food> GetCombosByCinema(int cinemaId)
+    {
+        return _context.Combo_Cinema
+            .Where(c => c.MaRap == cinemaId)
+            .Include(c => c.Food)
+            .Select(c => c.Food)
+            .ToList();
+    }
 }
