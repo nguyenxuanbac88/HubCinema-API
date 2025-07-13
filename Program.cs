@@ -102,6 +102,9 @@ builder.Services.AddScoped<PrivateService>();
 builder.Services.AddScoped<IScheduleService, ScheduleService>();
 builder.Services.AddScoped<SeatLayoutService>();
 builder.Services.AddScoped<RedisService>();
+builder.Services.AddScoped<ISeatLayoutCacheService, SeatLayoutCacheService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
+
 
 
 

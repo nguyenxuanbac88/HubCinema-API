@@ -4,25 +4,34 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace API_Project.Models.Entities
 {
     [Table("GheDaDat")]
-    public class BookedSeats
+    public class BookedSeat
     {
         [Key]
         [Column("id")]
-        public int IDBooked { get; set; }
+        public int Id { get; set; }
+
         [Column("SuatChieuId")]
-        public int IdShowtime { get; set; }
+        public int ShowtimeId { get; set; }
+
         [Column("MaGhe")]
-        public string IdSeat { get; set; }
+        public string SeatCode { get; set; }
+
         [Column("MaNguoiDung")]
-        public int IdUser { get; set; }
+        public int UserId { get; set; }
+
         [Column("GiaVe")]
         public int Price { get; set; }
-        [Column("TrangThai")]
-        public string status { get; set; }
-        [Column("HinhThucmua")]
-        public string purchase { get; set; }
-        [Column("ThoiGianDat")]
-        public DateTime CreateAt { get; set; }
 
+        [Column("TrangThai")]
+        public string Status { get; set; }
+
+        [Column("HinhThucmua")]
+        public string PurchaseMethod { get; set; }
+
+        [Column("ThoiGianDat")]
+        public DateTime CreatedAt { get; set; }
+
+        [Column("MaHoaDon")]
+        public int InvoiceId { get; set; }
     }
 }

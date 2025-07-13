@@ -27,13 +27,15 @@ namespace API_Project.Services
                 return (AuthResult.InvalidCredentials, null);
 
             string roleName = ((UserRole)user.Role).ToString();
-            string token = _jwtTokenGenerator.GenerateToken(user.Phone, roleName);
+
+            string token = _jwtTokenGenerator.GenerateToken(user.IDUser, user.Phone, roleName);
 
             user.TokenLogin = token;
             _db.SaveChanges();
 
             return (AuthResult.Success, token);
         }
+
 
         public RegisterResult Register(RegisterDTO model)
         {

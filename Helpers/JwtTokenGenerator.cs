@@ -2,6 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using API_Project.Models.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -16,7 +17,7 @@ namespace API_Project.Helpers
             _configuration = configuration;
         }
 
-        public string GenerateToken(string username, string role = "User")
+        public string GenerateToken(int userId, string username, string role = "User")
         {
             var jwtSection = _configuration.GetSection("Jwt");
 
@@ -25,9 +26,9 @@ namespace API_Project.Helpers
 
             var issuedAt = DateTime.UtcNow;
             var expiresInMinutes = int.TryParse(jwtSection["ExpiresInMinutes"], out var exp) ? exp : 60;
-
             var claims = new[]
             {
+                new Claim("id", userId.ToString()),
                 new Claim(ClaimTypes.Name, username),
                 new Claim(ClaimTypes.Role, role),
                 new Claim(JwtRegisteredClaimNames.Iat,

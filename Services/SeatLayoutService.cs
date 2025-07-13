@@ -23,7 +23,7 @@ namespace API_Project.Services
             if (_env.WebRootPath == null)
                 throw new InvalidOperationException("WebRootPath is not set.");
 
-            // 1. Lấy suất chiếu
+            //Lấy suất chiếu
             var suatChieu = await _dbContext.Showtimes
                 .FirstOrDefaultAsync(s => s.MaSuatChieu == idSuatChieu);
 
@@ -34,7 +34,7 @@ namespace API_Project.Services
             int maPhong = suatChieu.PhongChieu;
             int typeSuatChieu = suatChieu.TypeSuatChieu;
 
-            // 2. Lấy layout ID từ phòng
+            //Lấy layout ID từ phòng
             var phong = await _dbContext.Rooms
                 .FirstOrDefaultAsync(p => p.IDRoom == maPhong);
 
@@ -44,7 +44,7 @@ namespace API_Project.Services
             if (string.IsNullOrEmpty(phong.id_layout))
                 throw new Exception($"Phòng chiếu id = {maPhong} chưa có layout.");
 
-            // 3. Đọc file layout JSON
+            //Đọc file layout JSON
             string layoutPath = Path.Combine(_env.WebRootPath, "data", "seat-layout", $"{phong.id_layout}.json");
 
             if (!File.Exists(layoutPath))
@@ -53,18 +53,17 @@ namespace API_Project.Services
             string layoutJson = await File.ReadAllTextAsync(layoutPath);
             var layoutData = JsonSerializer.Deserialize<SeatLayoutWrapper>(layoutJson);
 
-            // 4. Ghế đã thanh toán
             var confirmedSeats = await _dbContext.BookedSeats
-                .Where(s => s.IdShowtime == idSuatChieu && s.status == "Đã thanh toán")
-                .Select(s => s.IdSeat)
+                .Where(s => s.ShowtimeId == idSuatChieu && s.Status == "Đã thanh toán")
+                .Select(s => s.SeatCode)
                 .ToListAsync();
 
-            // 5. Ghế đang giữ (từ Redis)
+            //Ghế đang giữ (từ Redis)
             string redisKey = $"suatchieu:{idSuatChieu}:held_seats";
             var heldSeats = await _redis.SetMembersAsync(redisKey);
             var heldList = heldSeats.Select(v => v.ToString()).ToList();
 
-            // 6. Giá suất chiếu
+            //Giá suất chiếu
             var loaiSuat = await _dbContext.ShowtimeTypes
                 .FirstOrDefaultAsync(x => x.Id == typeSuatChieu);
 
@@ -73,7 +72,7 @@ namespace API_Project.Services
 
             long giaSuatChieu = loaiSuat.Price;
 
-            // 7. Giá ghế theo dãy
+            //Giá ghế theo dãy
             var seatPrices = await _dbContext.SeatTypesInRooms
                 .Where(x => x.RoomId == maPhong && x.CinemaId == maRap)
                 .ToListAsync();
@@ -81,7 +80,7 @@ namespace API_Project.Services
                 x => x.RowCode,
                 x => new
                 {
-                    SeatType = x.SeatType, // KHÔNG .Name nữa
+                    SeatType = x.SeatType, 
                     Price = x.Price + giaSuatChieu
                 }
             );
