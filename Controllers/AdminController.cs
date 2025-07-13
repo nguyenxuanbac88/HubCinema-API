@@ -164,35 +164,34 @@ namespace API_Project.Controllers
         public async Task<IActionResult> CreateFood([FromBody] FoodDTO foodDTO)
         {
             if (foodDTO == null)
-            {
-                return BadRequest("Movie data is null");
-            }
+                return BadRequest("Food data is null");
+
             try
             {
-                var result = await _privateService.CreateFood(foodDTO);
-                if (result)
+                var createdFood = await _privateService.CreateFood(foodDTO);
+
+                if (createdFood != null && createdFood.IDFood != null)
                 {
-                    return Ok(new { message = "Food created successfully" });
+                    return Ok(createdFood);
                 }
-                else
+
+                return StatusCode(500, new
                 {
-                    return StatusCode(500, new
-                    {
-                        message = "Failed to create food",
-                        error = "CreateFood service returned false"
-                    });
-                }
+                    message = "Failed to create food",
+                    error = "Food creation returned null"
+                });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new
                 {
                     message = "Internal server error",
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
+                    error = ex.Message
                 });
             }
         }
+
+
         [HttpPost("CreateComboForCinemas")]
         public async Task<IActionResult> CreateComboForCinemas([FromBody] CreateComboCinema CreateComboCinema)
         {

@@ -142,27 +142,36 @@ namespace API_Project.AdminServices
         }
 
         //Food
-        public async Task<bool> CreateFood(FoodDTO foodDTO)
+        public async Task<FoodDTO> CreateFood(FoodDTO foodDTO)
         {
             try
             {
                 var food = new Food
                 {
-                    IDFood = foodDTO.IDFood,
                     FoodName = foodDTO.FoodName,
                     Price = foodDTO.Price,
                     Description = foodDTO.Description,
                     ImageURL = foodDTO.ImageURL,
                 };
+
                 _context.Foods.Add(food);
                 await _context.SaveChangesAsync();
-                return true;
+
+                return new FoodDTO
+                {
+                    IDFood = food.IDFood,
+                    FoodName = food.FoodName,
+                    Price = food.Price,
+                    Description = food.Description,
+                    ImageURL = food.ImageURL,
+                };
             }
             catch
             {
-                return false;
+                return null;
             }
         }
+
         public async Task<bool> CreateComboForCinemasAsync(CreateComboCinema dto)
         {
             try
