@@ -176,7 +176,11 @@ namespace API_Project.Controllers
                 }
                 else
                 {
-                    return StatusCode(500, "Failed to create food");
+                    return StatusCode(500, new
+                    {
+                        message = "Failed to create food",
+                        error = "CreateFood service returned false"
+                    });
                 }
             }
             catch (Exception ex)
