@@ -101,7 +101,6 @@ public class PublicService
                 Description = m.Description,
                 Price = m.Price,
                 ImageURL = m.ImageURL,
-                IDCinema = m.CinemaID,
             })
             .ToListAsync();
 
@@ -118,7 +117,6 @@ public class PublicService
                 Description = f.Description,
                 Price = f.Price,
                 ImageURL = f.ImageURL,
-                IDCinema = f.CinemaID,
             })
             .FirstOrDefaultAsync();
         return food;

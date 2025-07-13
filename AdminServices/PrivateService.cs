@@ -148,11 +148,11 @@ namespace API_Project.AdminServices
             {
                 var food = new Food
                 {
+                    IDFood = foodDTO.IDFood,
                     FoodName = foodDTO.FoodName,
                     Price = foodDTO.Price,
                     Description = foodDTO.Description,
                     ImageURL = foodDTO.ImageURL,
-                    CinemaID = foodDTO.IDCinema
                 };
                 _context.Foods.Add(food);
                 await _context.SaveChangesAsync();

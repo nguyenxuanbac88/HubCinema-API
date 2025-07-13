@@ -21,9 +21,6 @@ namespace API_Project.Models.Entities
 
         [Column("URL")]
         public string ImageURL { get; set; }
-
-        [Column("MaRap")]
-        public int CinemaID { get; set; }
         public virtual ICollection<Combo_Cinema> ComboCinemas { get; set; }
 
     }
