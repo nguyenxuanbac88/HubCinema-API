@@ -3,6 +3,7 @@ using API_Project.Models;
 using API_Project.Data;
 using Microsoft.EntityFrameworkCore;
 using API_Project.Models.DTOs;
+using API_Project.Models.Entities;
 
 namespace API_Project.Services
 {
@@ -112,6 +113,63 @@ namespace API_Project.Services
 
             return ApiResponse<List<int>>.Ok(movieIds);
         }
+
+        public async Task<bool> CreateShowtimeAsync(ShowtimeDTO showtimeDTO)
+        {
+            try
+            {
+                var movie = await _db.Movies.FirstOrDefaultAsync(m => m.IDMovie == showtimeDTO.MaPhim);
+                if (movie == null)
+                {
+                    Console.WriteLine("ERROR: Phim không tồn tại.");
+                    return false;
+                }
+
+                var newStart = showtimeDTO.GioChieu;
+                var newEnd = newStart
+                    .Add(TimeSpan.FromMinutes(movie.Duration + 20)); // 10' quảng cáo + 10' dọn rạp
+
+                var showtimesInSameRoom = await _db.Showtimes
+                    .Where(s => s.PhongChieu == showtimeDTO.PhongChieu && s.NgayChieu == showtimeDTO.NgayChieu)
+                    .ToListAsync();
+
+                foreach (var existing in showtimesInSameRoom)
+                {
+                    if (existing.GioKetThuc == null) continue;
+
+                    bool isOverlap = newStart < existing.GioKetThuc && existing.GioChieu < newEnd;
+                    if (isOverlap)
+                    {
+                        Console.WriteLine($"ERROR: Suất chiếu bị trùng tại phòng {showtimeDTO.PhongChieu}.");
+                        return false;
+                    }
+                }
+
+                var showTime = new Showtime
+                {
+                    MaSuatChieu = showtimeDTO.MaSuatChieu,
+                    PhongChieu = showtimeDTO.PhongChieu,
+                    MaPhim = showtimeDTO.MaPhim,
+                    NgayChieu = showtimeDTO.NgayChieu,
+                    GioChieu = newStart,
+                    GioKetThuc = newEnd,
+                    ChiPhi = showtimeDTO.ChiPhi,
+                    TypeSuatChieu = showtimeDTO.TypeSuatChieu,
+                    MaRap = showtimeDTO.MaRap
+                };
+
+                _db.Showtimes.Add(showTime);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: " + ex.Message);
+                return false;
+            }
+        }
+
+
 
     }
 }

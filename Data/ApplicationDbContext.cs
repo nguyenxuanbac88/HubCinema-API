@@ -18,7 +18,6 @@ namespace API_Project.Data
         public DbSet<Cinema> Cinemas { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Combo_Cinema> Combo_Cinema { get; set; }
-
         public DbSet<ShowtimeType> ShowtimeTypes { get; set; }
         public DbSet<SeatTypeInRoom> SeatTypesInRooms { get; set; }
 

@@ -32,7 +32,9 @@ namespace API_Project.Models.Entities
         [Column("MaRap")]
         public int MaRap { get; set; }
 
-        // Mapping đúng với cột TypeSuatChieu
+        [Column("GioKetThuc")]
+        public TimeSpan? GioKetThuc { get; set; }
+
         [ForeignKey("TypeSuatChieu")]
         public ShowtimeType ShowtimeType { get; set; }
 

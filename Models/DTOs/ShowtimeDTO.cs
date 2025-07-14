@@ -13,5 +13,6 @@ namespace API_Project.Models.DTOs
         public int ChiPhi { get; set; }
         public int TypeSuatChieu { get; set; }
         public int MaRap { get; set; }
+        public TimeSpan? GioKetThuc { get; set; }
     }
 }

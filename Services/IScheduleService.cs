@@ -10,8 +10,7 @@ namespace API_Project.Services
         Task<ApiResponse<List<DateTime>>> GetAvailableDatesAsync(int maPhim);
         Task<ApiResponse<List<GroupedShowtimeDTO>>> GetShowtimesAsync(int maPhim, DateTime date, string region = null, int? maRap = null);
         Task<ApiResponse<List<int>>> GetMovieIdsByCinemaAsync(int maRap);
-
-
+        Task<bool> CreateShowtimeAsync(ShowtimeDTO showtimeDTO);
     }
 
 }
