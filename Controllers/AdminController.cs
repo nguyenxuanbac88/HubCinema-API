@@ -222,7 +222,7 @@ namespace API_Project.Controllers
             }
         }
         [HttpGet("GetRoomsByCinemaId/{idCinema}")]
-        public async Task<IActionResult> GetRoomsByCinemaName(int idCinema)
+        public async Task<IActionResult> GetRoomsByCinemaId(int idCinema)
         {
             var rooms = await _privateService.GetRoomsByCinemaAsync(idCinema);
 
