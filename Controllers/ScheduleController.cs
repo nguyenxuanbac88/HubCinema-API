@@ -80,5 +80,23 @@ namespace API_Project.Controllers
                 });
             }
         }
+        [HttpGet("GetTimeline")]
+        public async Task<IActionResult> GetTimeline([FromQuery] DateTime ngay, [FromQuery] int maRap)
+        {
+            try
+            {
+                var data = await _scheduleService.GetShowtimesTimelineByDateAndCinemaAsync(ngay, maRap);
+
+                if (data == null || !data.Any())
+                    return NotFound(new { Success = false, Message = "Không có suất chiếu nào trong ngày." });
+
+                return Ok(new { Success = true, Data = data });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Đã xảy ra lỗi.", Error = ex.Message });
+            }
+        }
+
     }
 }
