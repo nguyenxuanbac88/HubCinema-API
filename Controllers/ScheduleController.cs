@@ -80,32 +80,5 @@ namespace API_Project.Controllers
                 });
             }
         }
-        [HttpGet("GetShowtimesByDate")]
-        public async Task<IActionResult> GetShowtimesByDate([FromQuery] DateTime ngayChieu)
-        {
-            try
-            {
-                var showtime = await _scheduleService.GetShowtimesByDateAsync(ngayChieu);
-                return Ok(showtime);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-        [HttpGet("GetShowtimesByCinema")]
-        public async Task<IActionResult> GetShowtimesByCinema([FromQuery] int maRap)
-        {
-            try
-            {
-                var showtime = await _scheduleService.GetShowtimesByCinemaAsync(maRap);
-                return Ok(showtime);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
     }
 }
