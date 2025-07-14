@@ -187,5 +187,26 @@ namespace API_Project.Services
                 .OrderBy(s => s.GioChieu)
                 .ToListAsync();
         }
+        public async Task<List<ShowtimeDTO>> GetShowtimesByCinemaAsync(int maRap)
+        {
+            return await _db.Showtimes
+                .Where(s => s.MaRap == maRap)
+                .Select(s => new ShowtimeDTO
+                {
+                    MaSuatChieu = s.MaSuatChieu,
+                    PhongChieu = s.PhongChieu,
+                    MaPhim = s.MaPhim,
+                    NgayChieu = s.NgayChieu,
+                    GioChieu = s.GioChieu,
+                    GioKetThuc = s.GioKetThuc,
+                    ChiPhi = s.ChiPhi,
+                    TypeSuatChieu = s.TypeSuatChieu,
+                    MaRap = s.MaRap
+                })
+                .OrderBy(s => s.NgayChieu)
+                .ThenBy(s => s.GioChieu)
+                .ToListAsync();
+        }
+
     }
 }

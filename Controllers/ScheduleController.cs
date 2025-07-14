@@ -93,6 +93,19 @@ namespace API_Project.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        [HttpGet("GetShowtimesByCinema")]
+        public async Task<IActionResult> GetShowtimesByCinema([FromQuery] int maRap)
+        {
+            try
+            {
+                var showtime = await _scheduleService.GetShowtimesByCinemaAsync(maRap);
+                return Ok(showtime);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
     }
 }
