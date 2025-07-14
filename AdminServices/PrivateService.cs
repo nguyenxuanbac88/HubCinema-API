@@ -101,11 +101,11 @@ namespace API_Project.AdminServices
         }
 
         //Room
-        public async Task<List<RoomDTO>> GetRoomsByCinemaAsync(string nameCinema)
+        public async Task<List<RoomDTO>> GetRoomsByCinemaAsync(int idCinema)
         {
             var room = await _context.Rooms
                 .Include(r => r.Cinema)
-                .Where(r => r.Cinema.CinemaName == nameCinema)
+                .Where(r => r.Cinema.IDCinema == idCinema)
                 .Select(r => new RoomDTO
                 {
                     IDRoom = r.IDRoom,

@@ -221,14 +221,14 @@ namespace API_Project.Controllers
                 });
             }
         }
-        [HttpGet("GetRoomsByCinemaName/{nameCinema}")]
-        public async Task<IActionResult> GetRoomsByCinemaName(string nameCinema)
+        [HttpGet("GetRoomsByCinemaId/{idCinema}")]
+        public async Task<IActionResult> GetRoomsByCinemaName(int idCinema)
         {
-            var rooms = await _privateService.GetRoomsByCinemaAsync(nameCinema);
+            var rooms = await _privateService.GetRoomsByCinemaAsync(idCinema);
 
             if (rooms == null || rooms.Count == 0)
             {
-                return NotFound($"Không tìm thấy phòng chiếu cho rạp có tên: {nameCinema}");
+                return NotFound($"Không tìm thấy phòng chiếu cho rạp có tên: {idCinema}");
             }
 
             return Ok(rooms);
