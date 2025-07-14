@@ -11,6 +11,7 @@ using System.Text;
 using StackExchange.Redis;
 using API_Project.AdminServices;
 using API_Project.Services.Interfaces;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +47,11 @@ builder.Services.AddCors(options =>
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "Your API", Version = "v1" });
+
+    // ✅ Thêm đoạn này để hiện <summary> trong Swagger
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -104,6 +110,7 @@ builder.Services.AddScoped<SeatLayoutService>();
 builder.Services.AddScoped<RedisService>();
 builder.Services.AddScoped<ISeatLayoutCacheService, SeatLayoutCacheService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<NewsService>();
 
 
 
