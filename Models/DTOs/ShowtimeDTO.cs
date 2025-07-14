@@ -10,9 +10,9 @@ namespace API_Project.Models.DTOs
         public int MaPhim { get; set; }
         public DateTime NgayChieu { get; set; }
         public TimeSpan GioChieu { get; set; }
+        public TimeSpan? GioKetThuc { get; set; }
         public int ChiPhi { get; set; }
         public int TypeSuatChieu { get; set; }
         public int MaRap { get; set; }
-        public TimeSpan? GioKetThuc { get; set; }
     }
 }

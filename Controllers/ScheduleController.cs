@@ -80,5 +80,19 @@ namespace API_Project.Controllers
                 });
             }
         }
+        [HttpGet("GetShowtimesByDate")]
+        public async Task<IActionResult> GetShowtimesByDate([FromQuery] DateTime ngayChieu)
+        {
+            try
+            {
+                var showtime = await _scheduleService.GetShowtimesByDateAsync(ngayChieu);
+                return Ok(showtime);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
     }
 }

@@ -168,8 +168,24 @@ namespace API_Project.Services
                 return false;
             }
         }
-
-
-
+        public async Task<List<ShowtimeDTO>> GetShowtimesByDateAsync(DateTime ngayChieu)
+        {
+            return await _db.Showtimes
+                .Where(s => s.NgayChieu.Date == ngayChieu.Date)
+                .Select(s => new ShowtimeDTO
+                {
+                    MaSuatChieu = s.MaSuatChieu,
+                    PhongChieu = s.PhongChieu,
+                    MaPhim = s.MaPhim,
+                    NgayChieu = s.NgayChieu,
+                    GioChieu = s.GioChieu,
+                    GioKetThuc = s.GioKetThuc,
+                    ChiPhi = s.ChiPhi,
+                    TypeSuatChieu = s.TypeSuatChieu,
+                    MaRap = s.MaRap
+                })
+                .OrderBy(s => s.GioChieu)
+                .ToListAsync();
+        }
     }
 }
