@@ -114,7 +114,7 @@ namespace API_Project.Controllers
                 var result = await _privateService.CreateCinema(cinemaDTO);
                 if (result)
                 {
-                    return Ok(new { message = "Movie created successfully" });
+                    return Ok(new { message = "Cinema created successfully" });
                 }
                 else
                 {
@@ -197,18 +197,18 @@ namespace API_Project.Controllers
         {
             if (CreateComboCinema == null)
             {
-                return BadRequest("Movie data is null");
+                return BadRequest("Combo data is null");
             }
             try
             {
                 var result = await _privateService.CreateComboForCinemasAsync(CreateComboCinema);
                 if (result)
                 {
-                    return Ok(new { message = "Movie created successfully" });
+                    return Ok(new { message = "Combo created successfully" });
                 }
                 else
                 {
-                    return StatusCode(500, "Failed to create movie");
+                    return StatusCode(500, "Failed to create Combo");
                 }
             }
             catch (Exception ex)
