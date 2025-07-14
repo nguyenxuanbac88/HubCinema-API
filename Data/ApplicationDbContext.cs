@@ -46,6 +46,8 @@ namespace API_Project.Data
                 .WithMany(c => c.ComboCinemas)
                 .HasForeignKey(cc => cc.MaRap);
         }
+        public DbSet<News> News { get; set; }
+        public DbSet<CategoryNews> CategoryNews { get; set; }
 
     }
 }
