@@ -85,12 +85,12 @@ namespace API_Project.Controllers
         {
             try
             {
-                var data = await _scheduleService.GetShowtimesTimelineByDateAndCinemaAsync(ngay, maRap);
+                var result = await _scheduleService.GetShowtimesTimelineByDateAndCinemaAsync(ngay, maRap);
 
-                if (data == null || !data.Any())
+                if (result == null || !result.Any())
                     return NotFound(new { Success = false, Message = "Không có suất chiếu nào trong ngày." });
 
-                return Ok(new { Success = true, Data = data });
+                return Ok(result);
             }
             catch (Exception ex)
             {
