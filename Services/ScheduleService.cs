@@ -179,7 +179,7 @@ namespace API_Project.Services
                     Name = s.Movie.MovieName,
                     Start = s.NgayChieu.Date.Add(s.GioChieu).ToString("yyyy-MM-ddTHH:mm:ss"),
                     End = s.NgayChieu.Date.Add(s.GioKetThuc ?? s.GioChieu.Add(TimeSpan.FromMinutes(120))).ToString("yyyy-MM-ddTHH:mm:ss"),
-                    Resource = $"Phòng {s.PhongChieu}"
+                    Resource = $"Rạp {s.PhongChieu}"
                 })
                 .ToListAsync();
 
