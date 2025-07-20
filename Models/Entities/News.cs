@@ -1,4 +1,6 @@
-﻿namespace API_Project.Models.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace API_Project.Models.Entities
 {
     public class News
     {
@@ -12,13 +14,13 @@
         public DateTime? CeateAt { get; set; }
         public string? Status { get; set; }
     }
-
-    public class CategoryNews
+    [Table("CategoryNews")]
+    public class Category
     {
         public long Id { get; set; }
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
         public string? Extra { get; set; }
-        public string? Status { get; set; }
+        public string? Status { get; set; } = "true";
         public string? Slug { get; set; }
     }
 

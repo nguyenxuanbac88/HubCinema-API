@@ -48,7 +48,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "Your API", Version = "v1" });
 
-    // ✅ Thêm đoạn này để hiện <summary> trong Swagger
+    //Thêm đoạn này để hiện <summary> trong Swagger
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath);

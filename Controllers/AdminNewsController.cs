@@ -28,7 +28,6 @@ namespace API_Project.Controllers
         /// <summary>
         /// Lấy chi tiết bài viết theo ID.
         /// </summary>
-        /// <param name="id">ID của bài viết cần lấy</param>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -40,7 +39,6 @@ namespace API_Project.Controllers
         /// <summary>
         /// Tạo mới một bài viết.
         /// </summary>
-        /// <param name="news">Đối tượng bài viết cần tạo</param>
         [HttpPost]
         public async Task<IActionResult> Create(News news)
         {
@@ -49,10 +47,8 @@ namespace API_Project.Controllers
         }
 
         /// <summary>
-        /// Cập nhật thông tin bài viết theo ID.
+        /// Cập nhật bài viết.
         /// </summary>
-        /// <param name="id">ID của bài viết</param>
-        /// <param name="news">Thông tin mới của bài viết</param>
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, News news)
         {
@@ -62,14 +58,36 @@ namespace API_Project.Controllers
         }
 
         /// <summary>
-        /// Xoá bài viết theo ID.
+        /// Xoá bài viết.
         /// </summary>
-        /// <param name="id">ID của bài viết cần xoá</param>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _newsService.DeleteAsync(id);
             return result ? NoContent() : NotFound();
+        }
+
+        // ------------------ CATEGORY API GỘP VÀO ĐÂY ------------------
+
+        /// <summary>
+        /// Lấy tất cả danh mục đang hiển thị.
+        /// </summary>
+        [HttpGet("categories")]
+        public async Task<IActionResult> GetAllCategories()
+        {
+            var categories = await _newsService.GetAllCategoriesAsync();
+            return Ok(categories);
+        }
+
+        /// <summary>
+        /// Lấy danh mục theo ID.
+        /// </summary>
+        [HttpGet("categories/{id}")]
+        public async Task<IActionResult> GetCategoryById(int id)
+        {
+            var category = await _newsService.GetCategoryByIdAsync(id);
+            if (category == null) return NotFound();
+            return Ok(category);
         }
     }
 }

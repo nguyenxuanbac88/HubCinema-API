@@ -27,6 +27,7 @@ namespace API_Project.Data
         public DbSet<InvoiceFood> InvoiceFoods { get; set; }
 
         public object ShowtimeType { get; internal set; }
+        public DbSet<Category> Categories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -46,7 +47,6 @@ namespace API_Project.Data
                 .HasForeignKey(cc => cc.MaRap);
         }
         public DbSet<News> News { get; set; }
-        public DbSet<CategoryNews> CategoryNews { get; set; }
 
     }
 }

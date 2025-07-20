@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using API_Project.Data;
 using API_Project.Models.Entities;
@@ -17,6 +18,7 @@ namespace API_Project.Services
             _context = context;
         }
 
+        // --------- NEWS CRUD ---------
         public async Task<List<News>> GetAllAsync()
         {
             return await _context.News.ToListAsync();
@@ -49,6 +51,19 @@ namespace API_Project.Services
             _context.News.Remove(news);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        // --------- CATEGORY ---------
+        public async Task<List<Category>> GetAllCategoriesAsync()
+        {
+            return await _context.Categories
+                .Where(c => c.Status == "true")
+                .ToListAsync();
+        }
+
+        public async Task<Category?> GetCategoryByIdAsync(long id)
+        {
+            return await _context.Categories.FindAsync(id);
         }
     }
 }
