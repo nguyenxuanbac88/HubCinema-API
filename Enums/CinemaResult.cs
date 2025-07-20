@@ -13,7 +13,8 @@
         LayoutNotFound = 5,
         InvalidSeat = 6,
         PriceMismatch = 7,
-        SaveError = 8
+        SaveError = 8,
+        NotFound=9
     }
     public static class BookingStatuses
     {

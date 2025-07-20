@@ -8,5 +8,6 @@ namespace API_Project.Services.Interfaces
     public interface IBookingService
     {
         Task<ApiResponse<int>> BookTicketsAsync(int userId, TicketBookingRequestDto request);
+        Task<ApiResponse<bool>> UpdateSeatStatusToPaidAsync(int invoiceId);
     }
 }
