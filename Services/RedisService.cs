@@ -4,49 +4,41 @@ namespace API_Project.Services
     public class RedisService
     {
         private readonly IDatabase _redis;
+        private const int ExpirationMinutes = 5;
 
         public RedisService(IConnectionMultiplexer redis)
         {
             _redis = redis.GetDatabase();
         }
 
-        public async Task<bool> HoldSeatAsync(int suatChieuId, string maGhe, string maNguoiDung)
+        private string GetSetKey(int suatChieuId) => $"suatchieu:{suatChieuId}:held_seats";
+
+        public async Task<bool> HoldSeatAsync(int suatChieuId, string maGhe)
         {
-            string key = $"seatlock:{suatChieuId}:{maGhe}";
-            return await _redis.StringSetAsync(key, maNguoiDung, TimeSpan.FromMinutes(5), When.NotExists);
+            string key = GetSetKey(suatChieuId);
+            bool added = await _redis.SetAddAsync(key, maGhe);
+            await _redis.KeyExpireAsync(key, TimeSpan.FromMinutes(ExpirationMinutes));
+            return added;
         }
 
         public async Task<bool> IsSeatLockedAsync(int suatChieuId, string maGhe)
         {
-            string key = $"seatlock:{suatChieuId}:{maGhe}";
-            return await _redis.KeyExistsAsync(key);
+            string key = GetSetKey(suatChieuId);
+            return await _redis.SetContainsAsync(key, maGhe);
         }
 
         public async Task<bool> ReleaseSeatAsync(int suatChieuId, string maGhe)
         {
-            string key = $"seatlock:{suatChieuId}:{maGhe}";
-            return await _redis.KeyDeleteAsync(key);
+            string key = GetSetKey(suatChieuId);
+            return await _redis.SetRemoveAsync(key, maGhe);
         }
 
-        public async Task<List<string>> GetHeldSeatsAsync(int showtimeId)
+        public async Task<List<string>> GetHeldSeatsAsync(int suatChieuId)
         {
-            var heldSeats = new List<string>();
-
-            var endpoints = _redis.Multiplexer.GetEndPoints();
-            var server = _redis.Multiplexer.GetServer(endpoints[0]);
-
-            var keys = server.Keys(pattern: $"seatlock:{showtimeId}:*");
-
-            foreach (var key in keys) // ❗ dùng foreach thường, không dùng await
-            {
-                var parts = key.ToString().Split(':');
-                if (parts.Length == 3)
-                {
-                    heldSeats.Add(parts[2]);
-                }
-            }
-
-            return heldSeats;
+            string key = GetSetKey(suatChieuId);
+            var members = await _redis.SetMembersAsync(key);
+            return members.Select(m => m.ToString()).ToList();
         }
     }
+
 }

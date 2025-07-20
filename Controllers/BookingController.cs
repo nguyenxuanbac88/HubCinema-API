@@ -1,4 +1,6 @@
-﻿using API_Project.Models.DTOs;
+﻿using API_Project.Enums;
+using API_Project.Models;
+using API_Project.Models.DTOs;
 using API_Project.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -37,4 +39,17 @@ public class BookingController : ControllerBase
             invoiceId = result.Data
         });
     }
+    [HttpPost("update-seat-status/{invoiceId}")]
+    [Authorize]
+    public async Task<IActionResult> UpdateSeatStatus(int invoiceId)
+    {
+        var result = await _bookingService.UpdateSeatStatusToPaidAsync(invoiceId);
+
+        if (!result.Success)
+            return BadRequest(new { message = result.Message });
+
+        return Ok(new { message = "Cập nhật trạng thái ghế thành công" });
+    }
+
+
 }

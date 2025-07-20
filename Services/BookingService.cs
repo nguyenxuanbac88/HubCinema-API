@@ -106,5 +106,31 @@ namespace API_Project.Services
 
             return ApiResponse<int>.Ok(invoice.IdInvoice);
         }
+        public async Task<ApiResponse<bool>> UpdateSeatStatusToPaidAsync(int invoiceId)
+        {
+            try
+            {
+                var bookedSeats = await _db.BookedSeats
+                    .Where(bs => bs.InvoiceId == invoiceId)
+                    .ToListAsync();
+
+                if (bookedSeats == null || !bookedSeats.Any())
+                    return ApiResponse<bool>.Fail(ScheduleErrorCode.InvalidSeat, "Không tìm thấy ghế đã đặt cho hóa đơn này.");
+
+                foreach (var seat in bookedSeats)
+                {
+                    seat.Status = BookingStatuses.DaThanhToan;
+                }
+
+                await _db.SaveChangesAsync();
+                return ApiResponse<bool>.Ok(true);
+            }
+            catch (Exception ex)
+            {
+ 
+                return ApiResponse<bool>.Fail(ScheduleErrorCode.SaveError, "Lỗi khi cập nhật trạng thái ghế.");
+            }
+        }
+
     }
 }

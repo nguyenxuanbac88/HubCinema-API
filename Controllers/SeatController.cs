@@ -11,18 +11,30 @@ namespace API_Project.Controllers
     {
         private readonly RedisService _redisService;
         private readonly SeatLayoutService _seatLayoutService;
+
         public SeatController(RedisService redisService, SeatLayoutService seatLayoutService)
         {
             _redisService = redisService;
             _seatLayoutService = seatLayoutService;
         }
-
-        // POST: api/Seat/hold
-        [HttpPost("hold")]
-        public async Task<IActionResult> HoldSeat(int showtimeId, string seatCode, string userId)
+        public class HoldSeatRequest
         {
-            var success = await _redisService.HoldSeatAsync(showtimeId, seatCode, userId);
-            return success ? Ok("Seat held successfully") : BadRequest("Seat is already held by someone else");
+            public int ShowtimeId { get; set; }
+            public List<string> SeatCodes { get; set; }
+        }
+
+        [HttpPost("hold-multiple")]
+        public async Task<IActionResult> HoldMultipleSeats([FromBody] HoldSeatRequest request)
+        {
+            var results = new Dictionary<string, bool>();
+
+            foreach (var seat in request.SeatCodes)
+            {
+                var success = await _redisService.HoldSeatAsync(request.ShowtimeId, seat);
+                results[seat] = success;
+            }
+
+            return Ok(results);
         }
 
         // GET: api/Seat/check?showtimeId=101&seatCode=A5
@@ -49,6 +61,7 @@ namespace API_Project.Controllers
             return Ok(list);
         }
 
+        // GET: api/Seat/get-layout-price/{idSuatChieu}
         [HttpGet("get-layout-price/{idSuatChieu}")]
         public async Task<IActionResult> GetLayoutWithPrices(int idSuatChieu)
         {
