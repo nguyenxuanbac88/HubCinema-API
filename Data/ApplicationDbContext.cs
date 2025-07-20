@@ -28,6 +28,7 @@ namespace API_Project.Data
 
         public object ShowtimeType { get; internal set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Banner> Banners { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
