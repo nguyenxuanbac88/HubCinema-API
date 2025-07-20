@@ -61,7 +61,9 @@ public class PublicService
                 TrailerURL = m.TrailerURL,
                 AgeRestriction = m.AgeRestriction,
                 Producer = m.Producer,
-                Actors = m.Actors
+                Actors = m.Actors,
+                EndDate = m.EndDate
+
             })
             .ToListAsync();
 
@@ -84,7 +86,8 @@ public class PublicService
                 TrailerURL = m.TrailerURL,
                 AgeRestriction = m.AgeRestriction,
                 Producer = m.Producer,
-                Actors = m.Actors
+                Actors = m.Actors,
+                EndDate = m.EndDate
             })
             .FirstOrDefaultAsync();
         return movie;
