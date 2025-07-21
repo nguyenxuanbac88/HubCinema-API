@@ -1,4 +1,5 @@
 ﻿using API_Project.Data;
+using API_Project.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using System.Text.Json;
@@ -95,6 +96,26 @@ namespace API_Project.Services
                 held = heldList,
                 prices = priceByRow
             };
+        }
+        public async Task<bool> SaveCustomSeatLayoutAsync(CustomSeatLayout request, string rootPath)
+        {
+            if (string.IsNullOrWhiteSpace(request.FileName) || request.Layout == null || request.Layout.Count == 0)
+                return false;
+
+            var layoutWrapper = new { layout = request.Layout };
+
+            string folder = Path.Combine(rootPath, "data", "seat-layout");
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
+            string filePath = Path.Combine(folder, $"{request.FileName}.json");
+            string json = JsonSerializer.Serialize(layoutWrapper, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+
+            await File.WriteAllTextAsync(filePath, json);
+            return true;
         }
 
 

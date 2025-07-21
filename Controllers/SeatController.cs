@@ -1,4 +1,5 @@
-﻿using API_Project.Services;
+﻿using API_Project.Models.DTOs;
+using API_Project.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,11 +12,13 @@ namespace API_Project.Controllers
     {
         private readonly RedisService _redisService;
         private readonly SeatLayoutService _seatLayoutService;
+        private readonly IWebHostEnvironment _env;
 
-        public SeatController(RedisService redisService, SeatLayoutService seatLayoutService)
+        public SeatController(RedisService redisService, SeatLayoutService seatLayoutService, IWebHostEnvironment env)
         {
             _redisService = redisService;
             _seatLayoutService = seatLayoutService;
+            _env = env;
         }
         public class HoldSeatRequest
         {
@@ -67,6 +70,17 @@ namespace API_Project.Controllers
         {
             var result = await _seatLayoutService.GetFullSeatLayoutWithPricesAsync(idSuatChieu);
             return Ok(result);
+        }
+
+        [HttpPost("Custom_Seat_Layout")]
+        public async Task<IActionResult> CreateCustomSeatLayout([FromBody] CustomSeatLayout request)
+        {
+            var success = await _seatLayoutService.SaveCustomSeatLayoutAsync(request, _env.WebRootPath);
+
+            if (!success)
+                return BadRequest("Dữ liệu không hợp lệ hoặc không thể lưu file.");
+
+            return Ok(new { Message = "Tạo ma trận thành công", FileName = request.FileName });
         }
     }
 }
