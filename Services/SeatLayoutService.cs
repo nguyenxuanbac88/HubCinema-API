@@ -102,21 +102,35 @@ namespace API_Project.Services
             if (string.IsNullOrWhiteSpace(request.FileName) || request.Layout == null || request.Layout.Count == 0)
                 return false;
 
-            var layoutWrapper = new { layout = request.Layout };
+            // Tìm phòng chiếu
+            var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.IDRoom == request.IdRoom);
+            if (room == null)
+                throw new Exception($"Không tìm thấy phòng chiếu với ID = {request.IdRoom}");
 
+            // Tạo folder nếu chưa có
             string folder = Path.Combine(rootPath, "data", "seat-layout");
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
 
-            string filePath = Path.Combine(folder, $"{request.FileName}.json");
+            // Ghi file JSON layout
+            string fileName = $"{request.FileName}.json";
+            string filePath = Path.Combine(folder, fileName);
+            var layoutWrapper = new { layout = request.Layout };
+
             string json = JsonSerializer.Serialize(layoutWrapper, new JsonSerializerOptions
             {
                 WriteIndented = true
             });
 
             await File.WriteAllTextAsync(filePath, json);
+
+            // Cập nhật id_layout trong bảng PhongChieu
+            room.id_layout = request.FileName;
+            await _dbContext.SaveChangesAsync();
+
             return true;
         }
+
 
 
 

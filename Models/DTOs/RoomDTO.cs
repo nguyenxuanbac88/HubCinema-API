@@ -8,5 +8,6 @@
         public int RoomType { get; set; }
         public string RoomImageURL { get; set; }
         public bool Status { get; set; }
+        public string? id_layout { get; set; }
     }
 }
