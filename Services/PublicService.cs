@@ -62,8 +62,8 @@ public class PublicService
                 AgeRestriction = m.AgeRestriction,
                 Producer = m.Producer,
                 Actors = m.Actors,
-                EndDate = m.EndDate
-
+                EndDate = m.EndDate,
+                Status = m.Status
             })
             .ToListAsync();
 
@@ -87,7 +87,8 @@ public class PublicService
                 AgeRestriction = m.AgeRestriction,
                 Producer = m.Producer,
                 Actors = m.Actors,
-                EndDate = m.EndDate
+                EndDate = m.EndDate,
+                Status = m.Status
             })
             .FirstOrDefaultAsync();
         return movie;

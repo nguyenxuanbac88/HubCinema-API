@@ -15,5 +15,6 @@
         public string Producer { get; set; }
         public string Actors { get; set; }
         public DateTime? EndDate { get; set; }
+        public int Status { get; set; }
     }
 }

@@ -128,7 +128,7 @@ namespace API_Project.Controllers
                 {
                     return NotFound(new { message = "Food not found" });
                 }
-                return Ok(food); // Đã sửa: Trả về dữ liệu food
+                return Ok(food); 
             }
             catch (Exception ex)
             {

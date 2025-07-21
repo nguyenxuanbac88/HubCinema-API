@@ -50,6 +50,7 @@ namespace API_Project.Models.Entities
         [Column("NgayKetThuc")]
         public DateTime? EndDate { get; set; }
         public ICollection<Showtime> Showtimes { get; set; }
+        public int Status { get; set; } // 0: Sắp chiếu, 1: Đang chiếu, 2: Ngừng chiếu
 
     }
 }
