@@ -62,15 +62,12 @@ namespace API_Project.Services
 
             return data;
         }
-
-
         public async Task<List<ChartDataPoint>> GetTicketSalesByCinemaAsync()
         {
             var data = await _db.BookedSeats
                 .Where(x => x.Status == "Đã thanh toán")
                 .Join(_db.Showtimes, bs => bs.ShowtimeId, st => st.MaSuatChieu, (bs, st) => new { bs, st })
-                .Join(_db.Rooms, temp => temp.st.PhongChieu, r => r.IDRoom, (temp, r) => new { temp.bs, Room = r })
-                .Join(_db.Cinemas, temp => temp.Room.CinemaID, c => c.IDCinema, (temp, c) => new { temp.bs, Cinema = c })
+                .Join(_db.Cinemas, temp => temp.st.MaRap, c => c.IDCinema, (temp, c) => new { temp.bs, Cinema = c })
                 .GroupBy(x => x.Cinema.CinemaName)
                 .Select(g => new ChartDataPoint
                 {
@@ -82,6 +79,7 @@ namespace API_Project.Services
 
             return data;
         }
+
         public async Task<DashboardFullDto> GetFullDashboardAsync()
         {
             var summary = await GetDashboardSummaryAsync();
@@ -95,6 +93,5 @@ namespace API_Project.Services
                 CinemaSales = cinemaSales
             };
         }
-
     }
 }
