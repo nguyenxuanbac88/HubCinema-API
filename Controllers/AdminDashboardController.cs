@@ -16,11 +16,12 @@ namespace API_Project.Controllers.Admin
             _dashboardService = dashboardService;
         }
 
+
         [HttpGet("summary")]
-        public async Task<IActionResult> GetSummary()
+        public async Task<IActionResult> GetFullDashboard()
         {
-            var summary = await _dashboardService.GetDashboardSummaryAsync();
-            return Ok(summary);
+            var data = await _dashboardService.GetFullDashboardAsync();
+            return Ok(data);
         }
     }
 }

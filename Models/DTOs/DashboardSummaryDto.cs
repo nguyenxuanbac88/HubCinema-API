@@ -12,4 +12,10 @@
         public int ActiveCinemas { get; set; }
         public int TotalUsers { get; set; }
     }
+    public class ChartDataPoint
+    {
+        public string Label { get; set; } = string.Empty;
+        public int Value { get; set; }
+    }
+
 }
