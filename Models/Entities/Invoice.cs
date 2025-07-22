@@ -30,6 +30,8 @@ namespace API_Project.Models.Entities
         public int PointEarned { get; set; }
 
         [Column("TrangThai")]
-        public int Status { get; set; }
+        public byte Status { get; set; }
+        public List<string> Seats { get; internal set; }
+        public List<InvoiceFood> Foods { get; set; }
     }
 }

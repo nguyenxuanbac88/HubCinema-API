@@ -16,6 +16,12 @@
         SaveError = 8,
         NotFound=9
     }
+    public enum InvoiceErrorCode
+    {
+        success = 0,
+        Error = 1,
+        None = -1
+    }
     public static class BookingStatuses
     {
         public const string ChoThanhToan = "Chờ thanh toán";

@@ -1,4 +1,5 @@
 ﻿using API_Project.Enums;
+using API_Project.Models.Entities;
 
 namespace API_Project.Models
 {
@@ -33,5 +34,17 @@ namespace API_Project.Models
                 Data = default
             };
         }
+
+        internal static ApiResponse<List<Invoice>> Fail(InvoiceErrorCode error, string message)
+        {
+            return new ApiResponse<List<Invoice>>
+            {
+                Success = false,
+                ErrorCode = ScheduleErrorCode.SaveError, // hoặc định nghĩa thêm enum mới nếu cần
+                Message = $"[{error}] {message}",
+                Data = default
+            };
+        }
+
     }
 }

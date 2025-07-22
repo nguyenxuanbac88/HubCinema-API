@@ -131,6 +131,47 @@ namespace API_Project.Services
                 return ApiResponse<bool>.Fail(ScheduleErrorCode.SaveError, "Lỗi khi cập nhật trạng thái ghế.");
             }
         }
+        public async Task<ApiResponse<List<Invoice>>> GetInvoicesByUserIdAsync(int userId)
+        {
+            try
+            {
+                var invoices = await _db.Invoices
+                    .Where(i => i.IdUser == userId)
+                    .OrderByDescending(i => i.CreateAt)
+                    .Select(i => new Invoice
+                    {
+                        IdInvoice = i.IdInvoice,
+                        TotalPrice = i.TotalPrice,
+                        CreateAt = i.CreateAt,
+                        PointUsed = i.PointUsed,
+                        PointEarned = i.PointEarned,
+                        Status = i.Status,
+                        Seats = _db.BookedSeats
+                            .Where(bs => bs.InvoiceId == i.IdInvoice)
+                            .Select(bs => bs.SeatCode)
+                            .ToList(),
+                        Foods = _db.InvoiceFoods
+                            .Where(f => f.IdInvoice == i.IdInvoice)
+                            .Select(f => new InvoiceFood
+                            {
+                                IdFood = f.IdFood,
+                                Quantity = f.Quantity,
+                                TotalPrice = f.TotalPrice
+                            }).ToList()
+                    })
+                    .ToListAsync();
+                var filteredInvoices = invoices
+    .Where(i => i.Seats.Any() || i.Foods.Any()) // chỉ giữ hóa đơn có ghế hoặc đồ ăn
+    .ToList();
+                return ApiResponse<List<Invoice>>.Ok(filteredInvoices);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("❌ Lỗi khi lấy hóa đơn: " + ex.Message);
+                return ApiResponse<List<Invoice>>.Fail(InvoiceErrorCode.Error,"lỗi khi lấy hoá đơn");
+            }
+        }
+
 
     }
 }
