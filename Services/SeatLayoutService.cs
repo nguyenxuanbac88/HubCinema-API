@@ -1,4 +1,5 @@
 ﻿using API_Project.Data;
+using API_Project.Helpers;
 using API_Project.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
@@ -99,33 +100,34 @@ namespace API_Project.Services
         }
         public async Task<bool> SaveCustomSeatLayoutAsync(CustomSeatLayout request, string rootPath)
         {
-            if (string.IsNullOrWhiteSpace(request.FileName) || request.Layout == null || request.Layout.Count == 0)
-                return false;
-
             // Tìm phòng chiếu
             var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.IDRoom == request.IdRoom);
             if (room == null)
                 throw new Exception($"Không tìm thấy phòng chiếu với ID = {request.IdRoom}");
+
+            // Lấy tên rạp
+            var cinema = await _dbContext.Cinemas.FirstOrDefaultAsync(c => c.IDCinema == room.CinemaID);
+            if (cinema == null)
+                throw new Exception($"Không tìm thấy rạp chiếu với ID = {room.CinemaID}");
 
             // Tạo folder nếu chưa có
             string folder = Path.Combine(rootPath, "data", "seat-layout");
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
 
-            // Ghi file JSON layout
-            string fileName = $"{request.FileName}.json";
+            // Tạo tên file từ tên rạp + tên phòng (không dấu, không khoảng trắng, không ký tự lạ)
+            string rawFileName = $"{cinema.CinemaName}_{room.RoomName}";
+            string safeFileName = FileName.ToSafeFileName(rawFileName); // dùng helper đã tạo
+            string fileName = $"{safeFileName}.json";
             string filePath = Path.Combine(folder, fileName);
+
+            // Ghi file JSON
             var layoutWrapper = new { layout = request.Layout };
-
-            string json = JsonSerializer.Serialize(layoutWrapper, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
-
+            string json = JsonSerializer.Serialize(layoutWrapper, new JsonSerializerOptions { WriteIndented = true });
             await File.WriteAllTextAsync(filePath, json);
 
-            // Cập nhật id_layout trong bảng PhongChieu
-            room.id_layout = request.FileName;
+            // Cập nhật tên layout (không đuôi .json)
+            room.id_layout = Path.GetFileNameWithoutExtension(fileName);
             await _dbContext.SaveChangesAsync();
 
             return true;
