@@ -23,9 +23,9 @@ namespace API_Project.Services
 
             return new DashboardSummaryDto
             {
-                //TicketsToday = await _db.invoice.CountAsync(h => h.NgayTao.Date == today),
-                //TicketsThisMonth = await _db.invoice.CountAsync(h => h.NgayTao >= firstDayOfMonth),
-                //TicketsThisYear = await _db.invoice.CountAsync(h => h.NgayTao >= firstDayOfYear),
+                TicketsToday = await _db.Invoices.CountAsync(h => h.CreateAt.Date == today),
+                TicketsThisMonth = await _db.Invoices.CountAsync(h => h.CreateAt >= firstDayOfMonth),
+                TicketsThisYear = await _db.Invoices.CountAsync(h => h.CreateAt >= firstDayOfYear),
 
                 CurrentMovies = await _db.Movies.CountAsync(p => p.ReleaseDate <= today),
                 UpcomingMovies = await _db.Movies.CountAsync(p => p.ReleaseDate > today),
