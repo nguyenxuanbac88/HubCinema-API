@@ -51,20 +51,20 @@ public class BookingController : ControllerBase
         return Ok(new { message = "Cập nhật trạng thái ghế thành công" });
     }
 
-    [HttpGet("invoices")]
-    [Authorize]
-    public async Task<IActionResult> GetUserInvoices()
-    {
-        var userIdClaim = User.FindFirst("id");
-        if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
-            return Unauthorized("Token không hợp lệ");
+    //[HttpGet("invoices")]
+    //[Authorize]
+    //public async Task<IActionResult> GetUserInvoices()
+    //{
+    //    var userIdClaim = User.FindFirst("id");
+    //    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+    //        return Unauthorized("Token không hợp lệ");
 
-        var result = await _bookingService.GetInvoicesByUserIdAsync(userId);
+    //    var result = await _bookingService.GetInvoicesByUserIdAsync(userId);
 
-        if (!result.Success)
-            return BadRequest(new { message = result.Message });
+    //    if (!result.Success)
+    //        return BadRequest(new { message = result.Message });
 
-        return Ok(result.Data);
-    }
+    //    return Ok(result.Data);
+    //}
 
 }

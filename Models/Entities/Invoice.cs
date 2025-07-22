@@ -31,7 +31,6 @@ namespace API_Project.Models.Entities
 
         [Column("TrangThai")]
         public byte Status { get; set; }
-        public List<string> Seats { get; internal set; }
-        public List<InvoiceFood> Foods { get; set; }
+
     }
 }
