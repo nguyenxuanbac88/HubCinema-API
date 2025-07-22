@@ -82,5 +82,15 @@ namespace API_Project.Controllers
 
             return Ok(new { Message = "Tạo ma trận thành công", FileName = request.FileName });
         }
+        [HttpPost("set-seat-types")]
+        public async Task<IActionResult> SetSeatTypes([FromBody] SetSeatTypes request)
+        {
+            if (request.DanhSachGhe == null || !request.DanhSachGhe.Any())
+                return BadRequest(new { success = false, message = "Danh sách ghế không được để trống." });
+
+            await _seatLayoutService.SetSeatTypesAsync(request);
+            return Ok(new { success = true, message = "Cập nhật loại ghế thành công." });
+        }
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿using API_Project.Data;
 using API_Project.Helpers;
 using API_Project.Models.DTOs;
+using API_Project.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using System.Text.Json;
@@ -25,7 +26,6 @@ namespace API_Project.Services
             if (_env.WebRootPath == null)
                 throw new InvalidOperationException("WebRootPath is not set.");
 
-            //Lấy suất chiếu
             var suatChieu = await _dbContext.Showtimes
                 .FirstOrDefaultAsync(s => s.MaSuatChieu == idSuatChieu);
 
@@ -36,7 +36,6 @@ namespace API_Project.Services
             int maPhong = suatChieu.PhongChieu;
             int typeSuatChieu = suatChieu.TypeSuatChieu;
 
-            //Lấy layout ID từ phòng
             var phong = await _dbContext.Rooms
                 .FirstOrDefaultAsync(p => p.IDRoom == maPhong);
 
@@ -46,7 +45,6 @@ namespace API_Project.Services
             if (string.IsNullOrEmpty(phong.id_layout))
                 throw new Exception($"Phòng chiếu id = {maPhong} chưa có layout.");
 
-            //Đọc file layout JSON
             string layoutPath = Path.Combine(_env.WebRootPath, "data", "seat-layout", $"{phong.id_layout}.json");
 
             if (!File.Exists(layoutPath))
@@ -60,12 +58,10 @@ namespace API_Project.Services
                 .Select(s => s.SeatCode)
                 .ToListAsync();
 
-            //Ghế đang giữ (từ Redis)
             string redisKey = $"suatchieu:{idSuatChieu}:held_seats";
             var heldSeats = await _redis.SetMembersAsync(redisKey);
             var heldList = heldSeats.Select(v => v.ToString()).ToList();
 
-            //Giá suất chiếu
             var loaiSuat = await _dbContext.ShowtimeTypes
                 .FirstOrDefaultAsync(x => x.Id == typeSuatChieu);
 
@@ -74,22 +70,19 @@ namespace API_Project.Services
 
             long giaSuatChieu = loaiSuat.Price;
 
-            //Giá ghế theo dãy
             var seatPrices = await _dbContext.SeatTypesInRooms
                 .Where(x => x.RoomId == maPhong && x.CinemaId == maRap)
                 .ToListAsync();
+
             var priceByRow = seatPrices.ToDictionary(
                 x => x.RowCode,
                 x => new
                 {
-                    SeatType = x.SeatType, 
+                    SeatType = x.SeatType,
                     Price = x.Price + giaSuatChieu
                 }
             );
 
-
-
-            // 8. Trả về
             return new
             {
                 layout = layoutData.layout,
@@ -98,46 +91,66 @@ namespace API_Project.Services
                 prices = priceByRow
             };
         }
+
         public async Task<bool> SaveCustomSeatLayoutAsync(CustomSeatLayout request, string rootPath)
         {
-            // Tìm phòng chiếu
             var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.IDRoom == request.IdRoom);
             if (room == null)
                 throw new Exception($"Không tìm thấy phòng chiếu với ID = {request.IdRoom}");
 
-            // Lấy tên rạp
             var cinema = await _dbContext.Cinemas.FirstOrDefaultAsync(c => c.IDCinema == room.CinemaID);
             if (cinema == null)
                 throw new Exception($"Không tìm thấy rạp chiếu với ID = {room.CinemaID}");
 
-            // Tạo folder nếu chưa có
             string folder = Path.Combine(rootPath, "data", "seat-layout");
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
 
-            // Tạo tên file từ tên rạp + tên phòng (không dấu, không khoảng trắng, không ký tự lạ)
             string rawFileName = $"{cinema.CinemaName}_{room.RoomName}";
-            string safeFileName = FileName.ToSafeFileName(rawFileName); // dùng helper đã tạo
+            string safeFileName = FileName.ToSafeFileName(rawFileName);
             string fileName = $"{safeFileName}.json";
             string filePath = Path.Combine(folder, fileName);
 
-            // Ghi file JSON
             var layoutWrapper = new { layout = request.Layout };
             string json = JsonSerializer.Serialize(layoutWrapper, new JsonSerializerOptions { WriteIndented = true });
             await File.WriteAllTextAsync(filePath, json);
 
-            // Cập nhật tên layout (không đuôi .json)
             room.id_layout = Path.GetFileNameWithoutExtension(fileName);
             await _dbContext.SaveChangesAsync();
 
             return true;
         }
 
+        public async Task<bool> SetSeatTypesAsync(SetSeatTypes request)
+        {
+            // Xóa cấu hình cũ
+            var existing = await _dbContext.SeatTypesInRooms
+                .Where(x => x.RoomId == request.MaPhong)
+                .ToListAsync();
+
+            if (existing.Any())
+            {
+                _dbContext.SeatTypesInRooms.RemoveRange(existing);
+                await _dbContext.SaveChangesAsync();
+            }
+
+            // Thêm cấu hình mới
+            var newConfigs = request.DanhSachGhe.Select(g => new SeatTypeInRoom
+            {
+                RoomId = request.MaPhong,
+                CinemaId = request.MaRap,
+                RowCode = g.MaGhe,
+                SeatType = g.LoaiGhe,
+                Price = g.Gia
+            }).ToList();
+
+            await _dbContext.SeatTypesInRooms.AddRangeAsync(newConfigs);
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
 
 
-
-
-        // Helper class để map JSON
         private class SeatLayoutWrapper
         {
             public List<List<string?>> layout { get; set; } = new();
