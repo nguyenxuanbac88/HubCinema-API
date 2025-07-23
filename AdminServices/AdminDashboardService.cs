@@ -2,10 +2,13 @@
 using API_Project.Models;
 using API_Project.Models.DTOs;
 using API_Project.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API_Project.Services
 {
+    [Authorize(Roles = "Admin")]
     public class AdminDashboardService : IAdminDashboardService
     {
         private readonly ApplicationDbContext _db;

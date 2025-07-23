@@ -25,20 +25,6 @@ namespace API_Project.Services
 
         public async Task<ApiResponse<int>> BookTicketsAsync(int userId, TicketBookingRequestDto request)
         {
-            // 1. Lấy layout ghế từ Redis
-            //var layout = await _seatLayoutService.GetSeatLayoutAsync(request.IdShowtime);
-            //if (layout == null)
-            //    return ApiResponse<int>.Fail(ScheduleErrorCode.LayoutNotFound, "Layout ghế không tồn tại hoặc đã hết hạn");
-
-            // 2. Kiểm tra từng ghế
-            //foreach (var seat in request.Seats)
-            //{
-            //    if (!layout.ContainsKey(seat.MaGhe))
-            //        return ApiResponse<int>.Fail(ScheduleErrorCode.InvalidSeat, $"Ghế {seat.MaGhe} không hợp lệ");
-
-            //    if (layout[seat.MaGhe].Price != seat.Price)
-            //        return ApiResponse<int>.Fail(ScheduleErrorCode.PriceMismatch, $"Giá ghế {seat.MaGhe} không khớp với hệ thống");
-            //}
             // 1. Tính tổng tiền
             int tongTienGhe = request.Seats.Sum(g => g.Price);
             int tongTienDoAn = request.Foods.Sum(d => d.Price * d.Quantity);

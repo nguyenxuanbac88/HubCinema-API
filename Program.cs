@@ -112,6 +112,7 @@ builder.Services.AddScoped<RedisService>();
 builder.Services.AddScoped<ISeatLayoutCacheService, SeatLayoutCacheService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<NewsService>();
+builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 
 
 

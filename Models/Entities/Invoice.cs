@@ -21,7 +21,7 @@ namespace API_Project.Models.Entities
         public int TotalPrice { get; set; }
 
         [Column("MaVoucher")]
-        public int? IdVoucher { get; set; }
+        public long? IdVoucher { get; set; }
 
         [Column("TruTienDiem")]
         public int PointUsed { get; set; }
