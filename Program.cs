@@ -113,6 +113,7 @@ builder.Services.AddScoped<ISeatLayoutCacheService, SeatLayoutCacheService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<NewsService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+builder.Services.AddScoped<ISeatTypeInRoomService, SeatTypeInRoomService>();
 
 
 

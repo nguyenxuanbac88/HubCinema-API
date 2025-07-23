@@ -31,5 +31,6 @@ namespace API_Project.Models.Entities
 
         [ForeignKey("CinemaID")]
         public Cinema Cinema { get; set; }
+
     }
 }

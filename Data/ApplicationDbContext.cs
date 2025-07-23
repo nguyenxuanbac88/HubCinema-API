@@ -20,6 +20,7 @@ namespace API_Project.Data
         public DbSet<Combo_Cinema> Combo_Cinema { get; set; }
         public DbSet<ShowtimeType> ShowtimeTypes { get; set; }
         public DbSet<SeatTypeInRoom> SeatTypesInRooms { get; set; }
+        public DbSet<SeatTypeInRoom> SeatTypesInRoom { get; set; }
 
         public DbSet<Showtime> Showtimes { get; set; }
         public DbSet<Invoice> Invoices { get; set; }

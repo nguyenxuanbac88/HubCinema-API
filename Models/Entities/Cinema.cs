@@ -30,6 +30,5 @@ namespace API_Project.Models.Entities
         public ICollection<Showtime> Showtimes { get; set; }
         public virtual ICollection<Combo_Cinema> ComboCinemas { get; set; }
 
-
     }
 }
