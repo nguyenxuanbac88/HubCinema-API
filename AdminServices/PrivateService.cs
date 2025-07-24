@@ -134,8 +134,9 @@ namespace API_Project.AdminServices
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine("Error creating room: " + ex.Message);
                 return false;
             }
         }

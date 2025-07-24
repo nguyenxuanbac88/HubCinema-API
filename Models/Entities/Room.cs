@@ -9,7 +9,7 @@ namespace API_Project.Models.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("MaPhong")]
-        public int IDRoom { get; set; }
+        public int? IDRoom { get; set; }
 
         [Column("MaRap")]
         public int CinemaID { get; set; }
@@ -31,6 +31,9 @@ namespace API_Project.Models.Entities
 
         [ForeignKey("CinemaID")]
         public Cinema Cinema { get; set; }
+
+        [ForeignKey("RoomType")]
+        public SeatTypeInRoom TenLoaiPhong { get; set; }
 
     }
 }
