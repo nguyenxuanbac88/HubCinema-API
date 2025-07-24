@@ -124,7 +124,6 @@ namespace API_Project.AdminServices
             {
                 var room = new Room
                 {
-                    IDRoom = roomDTO.IDRoom,
                     CinemaID = roomDTO.CinemaID,
                     RoomName = roomDTO.RoomName,
                     RoomType = roomDTO.RoomType,
