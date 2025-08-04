@@ -73,6 +73,64 @@ namespace API_Project.Controllers
                 });
             }
         }
+        [HttpPut("UpdateRoom/{id}")]
+        public async Task<IActionResult> UpdateRoom(int id, [FromBody] RoomDTO roomDTO)
+        {
+            if (roomDTO == null)
+            {
+                return BadRequest("Movie data is null");
+            }
+            try
+            {
+                var result = await _privateService.UpdateRoomAsync(id, roomDTO);
+                if (result)
+                {
+                    return Ok(new { message = "Room updated successfully" });
+                }
+                else
+                {
+                    return NotFound(new { message = "Room not found" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Internal server error",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
+        [HttpPut("UpdateFood/{id}")]
+        public async Task<IActionResult> UpdateFood(int id, [FromBody] FoodDTO foodDTO)
+        {
+            if (foodDTO == null)
+            {
+                return BadRequest("Movie data is null");
+            }
+            try
+            {
+                var result = await _privateService.UpdateFoodAsync(id, foodDTO);
+                if (result)
+                {
+                    return Ok(new { message = "Food updated successfully" });
+                }
+                else
+                {
+                    return NotFound(new { message = "Food not found" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Internal server error",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
         [HttpPost("CreateMovie")]
         public async Task<IActionResult> CreateMovie([FromBody] MovieDTO movieDTO)
         {

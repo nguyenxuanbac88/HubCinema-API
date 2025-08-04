@@ -140,6 +140,23 @@ namespace API_Project.AdminServices
                 return false;
             }
         }
+        public async Task<bool> UpdateRoomAsync(int id, RoomDTO roomDTO)
+        {
+            var room = await _context.Rooms.FindAsync(id);
+            if (room == null)
+            {
+                return false;
+            }
+            room.CinemaID = roomDTO.CinemaID;
+            room.RoomName = roomDTO.RoomName;
+            room.RoomType = roomDTO.RoomType;
+            room.RoomImageURL = roomDTO.RoomImageURL;
+            room.Status = roomDTO.Status;
+            room.id_layout = roomDTO.id_layout;
+            _context.Rooms.Update(room);
+            await _context.SaveChangesAsync();
+            return true;
+        }
 
         //Food
         public async Task<FoodDTO> CreateFood(FoodDTO foodDTO)
@@ -170,6 +187,21 @@ namespace API_Project.AdminServices
             {
                 return null;
             }
+        }
+        public async Task<bool> UpdateFoodAsync(int id, FoodDTO foodDTO)
+        {
+            var food = await _context.Foods.FindAsync(id);
+            if (food == null)
+            {
+                return false;
+            }
+            food.FoodName = foodDTO.FoodName;
+            food.Price = foodDTO.Price;
+            food.Description = foodDTO.Description;
+            food.ImageURL = foodDTO.ImageURL;
+            _context.Foods.Update(food);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         public async Task<bool> CreateComboForCinemasAsync(CreateComboCinema dto)
