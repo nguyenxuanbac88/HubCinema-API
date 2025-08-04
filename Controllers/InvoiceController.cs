@@ -47,5 +47,18 @@ namespace API_Project.Controllers
             var result = await _invoiceService.Invoice(userId);
             return Ok(result);
         }
+        [HttpGet("{invoiceId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetInvoiceById(int invoiceId)
+        {
+            var result = await _invoiceService.GetInvoiceById(invoiceId);
+
+            if (result == null)
+                return NotFound($"Không tìm thấy hóa đơn với Id: {invoiceId}");
+
+            return Ok(result);
+        }
+
     }
 }
