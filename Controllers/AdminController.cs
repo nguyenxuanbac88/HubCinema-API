@@ -15,121 +15,17 @@ namespace API_Project.Controllers
         {
             _privateService = privateService;
         }
-        [HttpPut("UpdateMovie/{id}")]
-        public async Task<IActionResult> UpdateMovie(int id, [FromBody] MovieDTO movieDTO)
+        [HttpGet("GetRoomsByCinemaId/{idCinema}")]
+        public async Task<IActionResult> GetRoomsByCinemaId(int idCinema)
         {
-            if (movieDTO == null)
+            var rooms = await _privateService.GetRoomsByCinemaAsync(idCinema);
+
+            if (rooms == null || rooms.Count == 0)
             {
-                return BadRequest("Movie data is null");
+                return NotFound($"Không tìm thấy phòng chiếu cho rạp có tên: {idCinema}");
             }
-            try
-            {
-                var result = await _privateService.UpdateMovieAsync(id, movieDTO);
-                if (result)
-                {
-                    return Ok(new { message = "Movie updated successfully" });
-                }
-                else
-                {
-                    return NotFound(new { message = "Movie not found" });
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    message = "Internal server error",
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
-            }
-        }
-        [HttpPut("UpdateCinema/{id}")]
-        public async Task<IActionResult> UpdateCinema(int id, [FromBody] CinemaDTO cinemaDTO)
-        {
-            if (cinemaDTO == null)
-            {
-                return BadRequest("Cinema data is null");
-            }
-            try
-            {
-                var result = await _privateService.UpdateCinema(id, cinemaDTO);
-                if (result)
-                {
-                    return Ok(new { message = "Cinema updated successfully" });
-                }
-                else
-                {
-                    return NotFound(new { message = "Cinema not found" });
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    message = "Internal server error",
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
-            }
-        }
-        [HttpPut("UpdateRoom/{id}")]
-        public async Task<IActionResult> UpdateRoom(int id, [FromBody] RoomDTO roomDTO)
-        {
-            if (roomDTO == null)
-            {
-                return BadRequest("Movie data is null");
-            }
-            try
-            {
-                var result = await _privateService.UpdateRoomAsync(id, roomDTO);
-                if (result)
-                {
-                    return Ok(new { message = "Room updated successfully" });
-                }
-                else
-                {
-                    return NotFound(new { message = "Room not found" });
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    message = "Internal server error",
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
-            }
-        }
-        [HttpPut("UpdateFood/{id}")]
-        public async Task<IActionResult> UpdateFood(int id, [FromBody] FoodDTO foodDTO)
-        {
-            if (foodDTO == null)
-            {
-                return BadRequest("Movie data is null");
-            }
-            try
-            {
-                var result = await _privateService.UpdateFoodAsync(id, foodDTO);
-                if (result)
-                {
-                    return Ok(new { message = "Food updated successfully" });
-                }
-                else
-                {
-                    return NotFound(new { message = "Food not found" });
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    message = "Internal server error",
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
-            }
+
+            return Ok(rooms);
         }
         [HttpPost("CreateMovie")]
         public async Task<IActionResult> CreateMovie([FromBody] MovieDTO movieDTO)
@@ -279,17 +175,177 @@ namespace API_Project.Controllers
                 });
             }
         }
-        [HttpGet("GetRoomsByCinemaId/{idCinema}")]
-        public async Task<IActionResult> GetRoomsByCinemaId(int idCinema)
+        [HttpPut("UpdateMovie/{id}")]
+        public async Task<IActionResult> UpdateMovie(int id, [FromBody] MovieDTO movieDTO)
         {
-            var rooms = await _privateService.GetRoomsByCinemaAsync(idCinema);
-
-            if (rooms == null || rooms.Count == 0)
+            if (movieDTO == null)
             {
-                return NotFound($"Không tìm thấy phòng chiếu cho rạp có tên: {idCinema}");
+                return BadRequest("Movie data is null");
             }
-
-            return Ok(rooms);
+            try
+            {
+                var result = await _privateService.UpdateMovieAsync(id, movieDTO);
+                if (result)
+                {
+                    return Ok(new { message = "Movie updated successfully" });
+                }
+                else
+                {
+                    return NotFound(new { message = "Movie not found" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Internal server error",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
+        [HttpPut("UpdateCinema/{id}")]
+        public async Task<IActionResult> UpdateCinema(int id, [FromBody] CinemaDTO cinemaDTO)
+        {
+            if (cinemaDTO == null)
+            {
+                return BadRequest("Cinema data is null");
+            }
+            try
+            {
+                var result = await _privateService.UpdateCinema(id, cinemaDTO);
+                if (result)
+                {
+                    return Ok(new { message = "Cinema updated successfully" });
+                }
+                else
+                {
+                    return NotFound(new { message = "Cinema not found" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Internal server error",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
+        [HttpPut("UpdateRoom/{id}")]
+        public async Task<IActionResult> UpdateRoom(int id, [FromBody] RoomDTO roomDTO)
+        {
+            if (roomDTO == null)
+            {
+                return BadRequest("Movie data is null");
+            }
+            try
+            {
+                var result = await _privateService.UpdateRoomAsync(id, roomDTO);
+                if (result)
+                {
+                    return Ok(new { message = "Room updated successfully" });
+                }
+                else
+                {
+                    return NotFound(new { message = "Room not found" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Internal server error",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
+        [HttpPut("UpdateFood/{id}")]
+        public async Task<IActionResult> UpdateFood(int id, [FromBody] FoodDTO foodDTO)
+        {
+            if (foodDTO == null)
+            {
+                return BadRequest("Movie data is null");
+            }
+            try
+            {
+                var result = await _privateService.UpdateFoodAsync(id, foodDTO);
+                if (result)
+                {
+                    return Ok(new { message = "Food updated successfully" });
+                }
+                else
+                {
+                    return NotFound(new { message = "Food not found" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Internal server error",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
+        [HttpDelete("DeleteCinema/{id}")]
+        public async Task<IActionResult> DeleteCinema(int id)
+        {
+            try
+            {
+                var result = await _privateService.DeleteCinemaAsync(id);
+                if (!result) return StatusCode(500, "Đã xảy ra lỗi khi xoá Cinema.");
+                return Ok("Xoá Cinema thành công.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpDelete("DeleteMovie/{id}")]
+        public async Task<IActionResult> DeleteMovie(int id)
+        {
+            try
+            {
+                var result = await _privateService.DeleteMovieAsync(id);
+                if (!result) return StatusCode(500, "Đã xảy ra lỗi khi xoá Movie.");
+                return Ok("Xoá Movie thành công.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpDelete("DeleteRoom/{id}")]
+        public async Task<IActionResult> DeleteRoom(int id)
+        {
+            try
+            {
+                var result = await _privateService.DeleteRoomAsync(id);
+                if (!result) return StatusCode(500, "Đã xảy ra lỗi khi xoá Room.");
+                return Ok("Xoá Room thành công.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpDelete("DeleteFood/{id}")]
+        public async Task<IActionResult> DeleteFood(int id)
+        {
+            try
+            {
+                var result = await _privateService.DeleteFoodAsync(id);
+                if (!result) return StatusCode(500, "Đã xảy ra lỗi khi xoá Food.");
+                return Ok("Xoá Food thành công.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

@@ -47,6 +47,24 @@ namespace API_Project.AdminServices
             await _context.SaveChangesAsync();
             return true;
         }
+        public async Task<bool> DeleteCinemaAsync(int id)
+        {
+            var cinema = await _context.Cinemas.FindAsync(id);
+            if (cinema == null)
+            {
+                return false;
+            }
+            try
+            {
+                _context.Cinemas.Remove(cinema);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         //Movie
         public async Task<bool> CreateMovie(MovieDTO movieDTO)
         {
@@ -100,7 +118,24 @@ namespace API_Project.AdminServices
             await _context.SaveChangesAsync();
             return true;
         }
-
+        public async Task<bool> DeleteMovieAsync(int id)
+        {
+            var movie = await _context.Movies.FindAsync(id);
+            if (movie == null)
+            {
+                return false;
+            }
+            try
+            {
+                _context.Movies.Remove(movie);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         //Room
         public async Task<List<RoomDTO>> GetRoomsByCinemaAsync(int idCinema)
         {
@@ -158,7 +193,24 @@ namespace API_Project.AdminServices
             await _context.SaveChangesAsync();
             return true;
         }
-
+        public async Task<bool> DeleteRoomAsync(int id)
+        {
+            var room = await _context.Rooms.FindAsync(id);
+            if (room == null)
+            {
+                return false;
+            }
+            try
+            {
+                _context.Rooms.Remove(room);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         //Food
         public async Task<FoodDTO> CreateFood(FoodDTO foodDTO)
         {
@@ -204,7 +256,24 @@ namespace API_Project.AdminServices
             await _context.SaveChangesAsync();
             return true;
         }
-
+        public async Task<bool> DeleteFoodAsync(int id)
+        {
+            var food = await _context.Foods.FindAsync(id);
+            if (food == null)
+            {
+                return false;
+            }
+            try
+            {
+                _context.Foods.Remove(food);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         public async Task<bool> CreateComboForCinemasAsync(CreateComboCinema dto)
         {
             try
