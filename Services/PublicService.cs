@@ -19,6 +19,7 @@ public class PublicService
     public async Task<List<CinemaDTO>> GetAllCinemaAsync()
     {
         var cinemas = await _context.Cinemas
+            .OrderByDescending(m => m.IDCinema)
             .Select(c => new CinemaDTO
             {
                 IDCinema = c.IDCinema,
@@ -48,6 +49,7 @@ public class PublicService
     public async Task<List<MovieDTO>> GetAllMoviesAsync()
     {
         var movies = await _context.Movies
+            .OrderByDescending(m => m.IDMovie)
             .Select(m => new MovieDTO
             {
                 IDMovie = m.IDMovie,
@@ -98,6 +100,7 @@ public class PublicService
     public async Task<List<FoodDTO>> GetAllFoodsAsync()
     {
         var foods = await _context.Foods
+            .OrderByDescending(m => m.IDFood)
             .Select(m => new FoodDTO
             {
                 IDFood = m.IDFood,
