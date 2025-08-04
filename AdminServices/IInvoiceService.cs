@@ -5,6 +5,7 @@
     public interface IInvoiceService
     {
         Task<List<InvoiceDetailDto>> GetAllInvoicesAsync();
+        Task<List<object>> Invoice(int userId);
     }
 
 }
