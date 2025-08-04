@@ -60,6 +60,7 @@ namespace API_Project.AdminServices
                     Description = movieDTO.Description,
                     Director = movieDTO.Director,
                     ReleaseDate = movieDTO.ReleaseDate,
+                    EndDate = movieDTO.EndDate,
                     CoverURL = movieDTO.CoverURL,
                     TrailerURL = movieDTO.TrailerURL,
                     AgeRestriction = movieDTO.AgeRestriction,
