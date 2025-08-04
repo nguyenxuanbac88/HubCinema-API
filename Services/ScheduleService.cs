@@ -172,6 +172,7 @@ namespace API_Project.Services
         {
             var showtimes = await _db.Showtimes
                 .Include(s => s.Movie)
+                .Include(s => s.Room)
                 .Where(s => s.NgayChieu.Date == ngay.Date && s.MaRap == maRap)
                 .Select(s => new ShowtimeTimelineDTO
                 {
@@ -179,12 +180,10 @@ namespace API_Project.Services
                     Name = s.Movie.MovieName,
                     Start = s.NgayChieu.Date.Add(s.GioChieu).ToString("yyyy-MM-ddTHH:mm:ss"),
                     End = s.NgayChieu.Date.Add(s.GioKetThuc ?? s.GioChieu.Add(TimeSpan.FromMinutes(120))).ToString("yyyy-MM-ddTHH:mm:ss"),
-                    Resource = $"Rạp {s.PhongChieu}"
+                    Resource = $"{s.Room.RoomName}"
                 })
                 .ToListAsync();
-
             return showtimes;
         }
-
     }
 }
