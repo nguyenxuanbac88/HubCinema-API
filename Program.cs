@@ -27,6 +27,7 @@ builder.Services.AddControllersWithViews(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<BannerService>();
+builder.Services.AddScoped<IUserAdminService, UserAdminService>();
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
