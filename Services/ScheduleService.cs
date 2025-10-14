@@ -113,7 +113,7 @@ namespace API_Project.Services
 
             return ApiResponse<List<int>>.Ok(movieIds);
         }
-
+        //
         public async Task<bool> CreateShowtimeAsync(ShowtimeDTO showtimeDTO)
         {
             try
@@ -195,10 +195,10 @@ namespace API_Project.Services
                 .Select(s => new ShowtimeTimelineDTO
                 {
                     Id = s.MaSuatChieu.ToString(),
-                    Name = s.Movie.MovieName,
+                    Name = s.Movie?.MovieName ?? "Không rõ phim",
                     Start = s.NgayChieu.Date.Add(s.GioChieu).ToString("yyyy-MM-ddTHH:mm:ss"),
                     End = s.NgayChieu.Date.Add(s.GioKetThuc ?? s.GioChieu.Add(TimeSpan.FromMinutes(120))).ToString("yyyy-MM-ddTHH:mm:ss"),
-                    Resource = $"{s.Room.RoomName}"
+                    Resource = $"{s.Room?.RoomName ?? "Không rõ phòng"}"
                 })
                 .ToListAsync();
             return showtimes;
