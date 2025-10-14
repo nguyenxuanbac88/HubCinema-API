@@ -188,20 +188,31 @@ namespace API_Project.Services
         }
         public async Task<List<ShowtimeTimelineDTO>> GetShowtimesTimelineByDateAndCinemaAsync(DateTime ngay, int maRap)
         {
-            var showtimes = await _db.Showtimes
-                .Include(s => s.Movie)
-                .Include(s => s.Room)
-                .Where(s => s.NgayChieu.Date == ngay.Date && s.MaRap == maRap)
-                .Select(s => new ShowtimeTimelineDTO
+            try
+            {
+                var showtimes = await _db.Showtimes
+                    .Include(s => s.Movie)
+                    .Include(s => s.Room)
+                    .Where(s => s.NgayChieu.Date == ngay.Date && s.MaRap == maRap)
+                    .ToListAsync(); // Lấy data về memory trước
+
+                // Xử lý sau khi đã ToListAsync() - không còn Expression Tree
+                var result = showtimes.Select(s => new ShowtimeTimelineDTO
                 {
                     Id = s.MaSuatChieu.ToString(),
-                    Name = s.Movie?.MovieName ?? "Không rõ phim",
+                    Name = s.Movie?.MovieName ?? "Không rõ phim", // ✅ OK sau ToListAsync()
                     Start = s.NgayChieu.Date.Add(s.GioChieu).ToString("yyyy-MM-ddTHH:mm:ss"),
                     End = s.NgayChieu.Date.Add(s.GioKetThuc ?? s.GioChieu.Add(TimeSpan.FromMinutes(120))).ToString("yyyy-MM-ddTHH:mm:ss"),
-                    Resource = $"{s.Room?.RoomName ?? "Không rõ phòng"}"
-                })
-                .ToListAsync();
-            return showtimes;
+                    Resource = s.Room?.RoomName ?? $"Phòng {s.PhongChieu}" // ✅ OK sau ToListAsync()
+                }).ToList();
+                
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"GetShowtimesTimelineByDateAndCinemaAsync Error: {ex.Message}");
+                return new List<ShowtimeTimelineDTO>();
+            }
         }
     }
 }
