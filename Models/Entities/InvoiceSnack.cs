@@ -21,5 +21,6 @@ namespace API_Project.Models.Entities
 
         [Column("TongTien")]
         public int TotalPrice { get; set; }
+        public Food Food { get; set; }
     }
 }
