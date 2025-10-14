@@ -126,21 +126,39 @@ namespace API_Project.Services
                 }
 
                 var newStart = showtimeDTO.GioChieu;
-                var newEnd = newStart
-                    .Add(TimeSpan.FromMinutes(movie.Duration + 20)); // 10' quảng cáo + 10' dọn rạp
+                var newEnd = newStart.Add(TimeSpan.FromMinutes(movie.Duration + 20));
 
                 var showtimesInSameRoom = await _db.Showtimes
-                    .Where(s => s.PhongChieu == showtimeDTO.PhongChieu && s.NgayChieu == showtimeDTO.NgayChieu)
+                    .Where(s => s.PhongChieu == showtimeDTO.PhongChieu && 
+                               s.NgayChieu.Date == showtimeDTO.NgayChieu.Date) // So sánh chỉ ngày
                     .ToListAsync();
 
                 foreach (var existing in showtimesInSameRoom)
                 {
-                    if (existing.GioKetThuc == null) continue;
+                    // Tính toán thời gian kết thúc nếu null
+                    var existingEnd = existing.GioKetThuc;
+                    if (existingEnd == null)
+                    {
+                        var existingMovie = await _db.Movies.FirstOrDefaultAsync(m => m.IDMovie == existing.MaPhim);
+                        if (existingMovie != null)
+                        {
+                            existingEnd = existing.GioChieu.Add(TimeSpan.FromMinutes(existingMovie.Duration + 20));
+                        }
+                        else
+                        {
+                            existingEnd = existing.GioChieu.Add(TimeSpan.FromMinutes(140)); // Default 120 phút + 20 phút buffer
+                        }
+                    }
 
-                    bool isOverlap = newStart < existing.GioKetThuc && existing.GioChieu < newEnd;
+                    // Kiểm tra trùng lặp với buffer time (thêm 15-30 phút giữa các suất)
+                    var bufferTime = TimeSpan.FromMinutes(15);
+                    bool isOverlap = newStart < existingEnd.Value.Add(bufferTime) && 
+                                   existing.GioChieu < newEnd.Add(bufferTime);
+                    
                     if (isOverlap)
                     {
-                        Console.WriteLine($"ERROR: Suất chiếu bị trùng tại phòng {showtimeDTO.PhongChieu}.");
+                        Console.WriteLine($"ERROR: Suất chiếu bị trùng tại phòng {showtimeDTO.PhongChieu}. " +
+                                        $"Existing: {existing.GioChieu}-{existingEnd}, New: {newStart}-{newEnd}");
                         return false;
                     }
                 }
