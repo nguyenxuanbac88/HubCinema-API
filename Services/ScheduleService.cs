@@ -130,7 +130,7 @@ namespace API_Project.Services
 
                 var showtimesInSameRoom = await _db.Showtimes
                     .Where(s => s.PhongChieu == showtimeDTO.PhongChieu && 
-                               s.NgayChieu.Date == showtimeDTO.NgayChieu.Date) // So sánh chỉ ngày
+                               s.NgayChieu.Date == showtimeDTO.NgayChieu.Date)
                     .ToListAsync();
 
                 foreach (var existing in showtimesInSameRoom)
@@ -146,19 +146,25 @@ namespace API_Project.Services
                         }
                         else
                         {
-                            existingEnd = existing.GioChieu.Add(TimeSpan.FromMinutes(140)); // Default 120 phút + 20 phút buffer
+                            existingEnd = existing.GioChieu.Add(TimeSpan.FromMinutes(140));
                         }
                     }
 
-                    // Kiểm tra trùng lặp với buffer time (thêm 15-30 phút giữa các suất)
+                    // SỬA LẠI LOGIC KIỂM TRA TRÙNG LỊCH
                     var bufferTime = TimeSpan.FromMinutes(15);
-                    bool isOverlap = newStart < existingEnd.Value.Add(bufferTime) && 
-                                   existing.GioChieu < newEnd.Add(bufferTime);
+                    
+                    // Thêm buffer time vào thời gian existing để tạo khoảng cách
+                    var existingStartWithBuffer = existing.GioChieu.Subtract(bufferTime);
+                    var existingEndWithBuffer = existingEnd.Value.Add(bufferTime);
+                    
+                    // Kiểm tra overlap: suất mới có bị chồng lấn với existing không?
+                    bool isOverlap = (newStart < existingEndWithBuffer) && (newEnd > existingStartWithBuffer);
                     
                     if (isOverlap)
                     {
                         Console.WriteLine($"ERROR: Suất chiếu bị trùng tại phòng {showtimeDTO.PhongChieu}. " +
-                                        $"Existing: {existing.GioChieu}-{existingEnd}, New: {newStart}-{newEnd}");
+                                        $"Existing: {existing.GioChieu}-{existingEnd} (buffer: {existingStartWithBuffer}-{existingEndWithBuffer}), " +
+                                        $"New: {newStart}-{newEnd}");
                         return false;
                     }
                 }
