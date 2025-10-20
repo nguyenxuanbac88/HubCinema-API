@@ -47,17 +47,20 @@ namespace API_Project.Services
             if (!exists)
                 return ApiResponse<List<DateTime>>.Fail(ScheduleErrorCode.MovieNotFound, "Phim không tồn tại.");
 
-            var dates = await _db.Showtimes
+            var showtimes = await _db.Showtimes
                 .Where(s => s.MaPhim == maPhim)
-                .Select(s => s.NgayChieu)
-                .Distinct()
-                .OrderBy(d => d)
                 .ToListAsync();
 
-            if (!dates.Any())
+            if (!showtimes.Any())
                 return ApiResponse<List<DateTime>>.Fail(ScheduleErrorCode.NoShowtimes, "Không có suất chiếu.");
 
-            return ApiResponse<List<DateTime>>.Ok(dates);
+            // Kết hợp NgayChieu và GioChieu để có được datetime đầy đủ
+            var dateTimeList = showtimes
+                .Select(s => s.NgayChieu.Date.Add(s.GioChieu))
+                .OrderBy(dt => dt)
+                .ToList();
+
+            return ApiResponse<List<DateTime>>.Ok(dateTimeList);
         }
 
         public async Task<ApiResponse<List<GroupedShowtimeDTO>>> GetShowtimesAsync(int maPhim, DateTime date, string region = null, int? maRap = null)
